@@ -39,7 +39,7 @@ main () {
         pinta(miVar1 * miVar2);
         print(miVar1);
     }
-    print("Segundo elemento de primera fila: ");
+    print("Fin de mi programa");
 }
 """
 
