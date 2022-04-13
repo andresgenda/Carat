@@ -1,5 +1,5 @@
-# Carat
-Carat Compiler
+# **CARAT COMPILER**
+El lenguaje Carat es un lenguaje de programación gráfico para que todas las personas puedan aprender a programar con facilidad.
 
-**AVANCE 1 - LéxicoSintaxis**
+# Avance 1 - LéxicoSintaxis
 El avance 1 consiste en establecer los tokens del lenguaje Carat, así como las gramáticas que determinan la sintaxis del mismo. Cualquier programa escrito en el lenguaje Carat debe de seguir con la sintaxis determinada en este avance. 
