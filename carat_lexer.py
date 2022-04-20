@@ -6,6 +6,18 @@ class Lexer():
 
     def _add_tokens(self):
         self.lexer.add('PROGRAM', r'program')
+        self.lexer.add('LINEUP', r'lineUp')
+        self.lexer.add('LINEDOWN', r'lineDown')
+        self.lexer.add('LINERT', r'lineRt')
+        self.lexer.add('LINELF', r'lineLf')
+        self.lexer.add('POINT', r'point')
+        self.lexer.add('CIRCLE', r'circle')
+        self.lexer.add('ARC', r'arc')
+        self.lexer.add('PENUP', r'penUp')
+        self.lexer.add('PENDOWN', r'penDown')
+        self.lexer.add('PENCOLOR', r'penColor')
+        self.lexer.add('PENSIZE', r'penSize')
+        self.lexer.add('CLEAR', r'clear')
         self.lexer.add('CTE_STRING', r"\"([^\"\\]|\\.)*\"")
         self.lexer.add('MAIN', r'main')
         self.lexer.add('INPUT', r'input')

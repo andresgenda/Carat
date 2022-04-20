@@ -8,7 +8,9 @@ class Parser():
             'OPEN_BRACK', 'CLOSE_BRACK', 'EQUAL', 'IF', 'MORE_THAN', 'LESS_THAN', 'NOT_EQUAL', 
             'ELSE', 'ADD', 'SUBSTR', 'MULT', 'DIVIS', 'VAR','CTE_STRING', 'ID', 'INT', 'FLOAT', 
             'CTE_INT', 'CTE_FLOAT', 'CHAR', 'VOID', 'RETURN', 'INPUT', 'FUNC', 'WHILE', 'DO', 'FOR',
-            'TO', 'IS_EQUAL', 'AND', 'OR', 'OPEN_CURLY', 'CLOSE_CURLY', 'MAIN'],
+            'TO', 'IS_EQUAL', 'AND', 'OR', 'OPEN_CURLY', 'CLOSE_CURLY', 'MAIN', 'LINEUP', 'LINEDOWN',
+            'LINERT', 'LINELF', 'POINT', 'CIRCLE', 'ARC', 'PENUP', 'PENDOWN', 'PENCOLOR', 'PENSIZE',
+            'CLEAR'],
 
             precedence=[
                 ('left', ['ADD', 'SUBSTR']),
@@ -126,6 +128,7 @@ class Parser():
         @self.pg.production('estatuto : ciclo_cc')
         @self.pg.production('estatuto : ciclo_sc')
         @self.pg.production('estatuto : llam_func')
+        @self.pg.production('estatuto : llam_esp')
         def estatuto(p):
             return Success()
         
@@ -262,6 +265,73 @@ class Parser():
         @self.pg.production('llam_func3 : COMMA exp llam_func3')
         @self.pg.production('llam_func3 : CLOSE_PARENTH SEMI_COLON')
         def llam_func3(p):
+            return Success()
+        
+        @self.pg.production('llam_esp : linea')
+        @self.pg.production('llam_esp : punto')
+        @self.pg.production('llam_esp : circulo')
+        @self.pg.production('llam_esp : arco')
+        @self.pg.production('llam_esp : pintar')
+        @self.pg.production('llam_esp : no_pintar')
+        @self.pg.production('llam_esp : col')
+        @self.pg.production('llam_esp : tam')
+        @self.pg.production('llam_esp : borrar')
+        def llam_esp(p):
+            return Success()
+        
+        @self.pg.production('linea : arriba')
+        @self.pg.production('linea : abajo')
+        @self.pg.production('linea : derecha')
+        @self.pg.production('linea : izq')
+        def linea(p):
+            return Success()
+        
+        @self.pg.production('arriba : LINEUP OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def arriba(p):
+            return Success()
+        
+        @self.pg.production('abajo : LINEDOWN OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def abajo(p):
+            return Success()
+        
+        @self.pg.production('derecha : LINERT OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def derecha(p):
+            return Success()
+        
+        @self.pg.production('izq : LINELF OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def izq(p):
+            return Success()
+        
+        @self.pg.production('punto : POINT OPEN_PARENTH exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        def punto(p):
+            return Success()
+        
+        @self.pg.production('circulo : CIRCLE OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def circulo(p):
+            return Success()
+        
+        @self.pg.production('arco : ARC OPEN_PARENTH exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        def arco(p):
+            return Success()
+        
+        @self.pg.production('pintar : PENDOWN OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
+        def pintar(p):
+            return Success()
+        
+        @self.pg.production('no_pintar : PENUP OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
+        def no_pintar(p):
+            return Success()
+        
+        @self.pg.production('col : PENCOLOR OPEN_PARENTH exp COMMA exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        def col(p):
+            return Success()
+        
+        @self.pg.production('tam : PENSIZE OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        def tam(p):
+            return Success()
+        
+        @self.pg.production('borrar : CLEAR OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
+        def borrar(p):
             return Success()
         
         @self.pg.error

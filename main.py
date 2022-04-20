@@ -21,24 +21,28 @@ int func fact(int miVar2) {
 void func pinta(int y) {
 	var int x;
 	x = 1;
+    penDown();
 	while(x < 11) do {
-		Circle(y + x*5);
-		Color(x + 10);
-		Size(10 - x);
+		circle(y + x*5);
+		penColor(x + 10, x + 15, 244);
+		penSize(10 - x);
 		x = x + 1;
     }
+    penUp();
 }
 
 main () {
 	input(miVar3);
     miVar2 = miVar3 * 2;
     miMatriz = {{1,2,3},{4,5,6}};
-    Point(0,0);
+    point(0,0);
     miVar1 = fact(miVar3);
     for miVar1 = 0 to 5 do {
         pinta(miVar1 * miVar2);
         print(miVar1);
     }
+    circle(2);
+    clear();
     print("Fin de mi programa");
 }
 """
