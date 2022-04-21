@@ -23,8 +23,8 @@ class Parser():
         self.help = Helpers()
 
     def parse(self):
-        @self.pg.production('programa : PROGRAM ID SEMI_COLON programa2')
-        @self.pg.production('programa : PROGRAM ID SEMI_COLON programa4')
+        @self.pg.production('programa : PROGRAM createDF ID SEMI_COLON programa2')
+        @self.pg.production('programa : PROGRAM createDF ID SEMI_COLON programa4')
         def programa(p):
             return p
 
@@ -42,16 +42,25 @@ class Parser():
         def programa4(p):
             return p
         
+        @self.pg.production('createDF : ')
+        def createDF(p):
+            print("AQUI CREO MI DIR DE FUNCS")
+            return p
+        
         @self.pg.production('vars : VAR tipo vars2')
         def vars(p):
             listaPlana = self.help.aplana(p)
+            misVars = []
+            #if type is INT
             if(listaPlana[1].gettokentype() == "INT"):
-                print("ENTERO")
+                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
+            #if type is FLOAT
             elif(listaPlana[1].gettokentype() == "FLOAT"):
-                print("FLOTANTE")
+                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
+            #if type is CHAR
             else:
-                print("CARACTER")
-            self.help.checkVars(listaPlana)
+                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
+            print(misVars)
             return p
         
         @self.pg.production('vars2 : ID arreglo vars3')
