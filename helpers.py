@@ -8,12 +8,13 @@ class Helpers:
         return miLista[:1] + self.aplana(miLista[1:])
     
     def checkVars(self, miLista, misVars, tipo):
-        currVar = []
+        #currVar = []
         if miLista[0].gettokentype() == "SEMI_COLON":
-            return
+            print(misVars)
         else:
             if miLista[0].gettokentype() == "ID":
-                currVar.append(miLista[0].value)
-                currVar.append(tipo)
-                misVars.append(currVar)
+                misVars[miLista[0].value] = tipo
+                # currVar.append(miLista[0].value)
+                # currVar.append(tipo)
+                # misVars.append(currVar)
             self.checkVars(miLista[1:], misVars, tipo)

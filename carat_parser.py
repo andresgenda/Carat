@@ -21,11 +21,17 @@ class Parser():
         )
 
         self.help = Helpers()
+        self.tabFunc = {}
+        self.currVarT = {}
+        self.currFunc = ""
+        self.currType = ""
 
     def parse(self):
-        @self.pg.production('programa : PROGRAM createDF ID SEMI_COLON programa2')
-        @self.pg.production('programa : PROGRAM createDF ID SEMI_COLON programa4')
+        @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa2')
+        @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa4')
         def programa(p):
+            self.tabFunc[self.currFunc].append(self.currVarT)
+            print(self.tabFunc)
             return p
 
         @self.pg.production('programa2 : vars programa3')
@@ -41,31 +47,38 @@ class Parser():
         @self.pg.production('programa4 : MAIN OPEN_PARENTH CLOSE_PARENTH OPEN_CURLY bloque CLOSE_CURLY')
         def programa4(p):
             return p
-        
-        @self.pg.production('createDF : ')
+
+        @self.pg.production('createDF : ID')
         def createDF(p):
-            print("AQUI CREO MI DIR DE FUNCS")
+            self.currFunc = p[0].value
+            self.tabFunc[self.currFunc] = ["void"]
             return p
         
         @self.pg.production('vars : VAR tipo vars2')
         def vars(p):
-            listaPlana = self.help.aplana(p)
-            misVars = []
-            #if type is INT
-            if(listaPlana[1].gettokentype() == "INT"):
-                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
-            #if type is FLOAT
-            elif(listaPlana[1].gettokentype() == "FLOAT"):
-                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
-            #if type is CHAR
-            else:
-                self.help.checkVars(listaPlana[2:], misVars, listaPlana[1].value)
-            print(misVars)
+            # listaPlana = self.help.aplana(p)
+            # #if type is INT
+            # if(listaPlana[1].gettokentype() == "INT"):
+            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
+            # #if type is FLOAT
+            # elif(listaPlana[1].gettokentype() == "FLOAT"):
+            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
+            # #if type is CHAR
+            # else:
+            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
+            # self.tabFunc[self.currFunc] = self.misVars
             return p
         
-        @self.pg.production('vars2 : ID arreglo vars3')
-        @self.pg.production('vars2 : ID vars3')
+        @self.pg.production('vars2 : idAux arreglo vars3')
+        @self.pg.production('vars2 : idAux vars3')
         def vars2(p):
+            return p
+        
+        @self.pg.production('idAux : ID')
+        def idAux(p):
+            if p[0].value in self.currVarT:
+                raise ValueError("Declaracion multiple de variables")
+            self.currVarT[p[0].value] = self.currType
             return p
         
         @self.pg.production('vars3 : COMMA vars2')
@@ -78,6 +91,7 @@ class Parser():
         @self.pg.production('tipo : FLOAT')
         @self.pg.production('tipo : CHAR')
         def tipo(p):
+            self.currType = p[0].value
             return p
         
         @self.pg.production('arreglo : def_arr')
@@ -99,9 +113,15 @@ class Parser():
         def funcion(p):
             return p
         
-        @self.pg.production('f_void : VOID init OPEN_CURLY f_void2')
+        @self.pg.production('f_void : bpVoid init OPEN_CURLY f_void2')
         def f_void(p):
             return p
+        
+        @self.pg.production('bpVoid : VOID')
+        def bpVoid(p):
+            self.currType = p[0].value
+            return p
+
 
         @self.pg.production('f_void2 : vars f_void3')
         @self.pg.production('f_void2 : f_void3')
@@ -125,9 +145,23 @@ class Parser():
         def f_ret3(p):
             return p
         
-        @self.pg.production('init : FUNC ID OPEN_PARENTH init2')
-        @self.pg.production('init : FUNC ID OPEN_PARENTH init3')
+        @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init2')
+        @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init3')
         def init(p):
+            return p
+        
+        #Funcion que recibe el nombre de una funcion
+        # - Funcion agrega las variables a la funcion actual y cambia la
+        #   funcion actual por la nueva funcion, vacia el arreglo de variables y
+        #   le asigna el tipo actual a la funcion
+        @self.pg.production('bpCurrFunc : ID')
+        def bpCurrFunc(p):
+            if p[0].value in self.tabFunc:
+                raise ValueError("Nombre de funcion ya existe")
+            self.tabFunc[self.currFunc].append(self.currVarT)
+            self.currVarT = {}
+            self.currFunc = p[0].value
+            self.tabFunc[self.currFunc] = [self.currType]
             return p
         
         @self.pg.production('init2 : tipo ID COMMA init2')
