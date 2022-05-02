@@ -1,7 +1,7 @@
 import rply
 from rply import ParserGenerator
-from ast import Success
 from helpers import Helpers
+from quadruples import Quadruples
 
 class Parser():
     def __init__(self):
@@ -22,16 +22,16 @@ class Parser():
 
         self.help = Helpers()
         self.tabFunc = {}
+        self.globalFunc = ""
         self.currVarT = {}
         self.currFunc = ""
         self.currType = ""
+        self.quads = Quadruples()
 
     def parse(self):
         @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa2')
         @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa4')
         def programa(p):
-            self.tabFunc[self.currFunc].append(self.currVarT)
-            print(self.tabFunc)
             return p
 
         @self.pg.production('programa2 : vars programa3')
@@ -44,13 +44,21 @@ class Parser():
         def programa3(p):
             return p
         
-        @self.pg.production('programa4 : MAIN OPEN_PARENTH CLOSE_PARENTH OPEN_CURLY bloque CLOSE_CURLY')
+        @self.pg.production('programa4 : varglobales MAIN OPEN_PARENTH CLOSE_PARENTH OPEN_CURLY bloque CLOSE_CURLY')
         def programa4(p):
+            return p
+        
+        @self.pg.production('varglobales : ')
+        def varglobales(p):
+            self.tabFunc[self.currFunc].append(self.currVarT)
+            self.currFunc = self.globalFunc
+            print(self.tabFunc)
             return p
 
         @self.pg.production('createDF : ID')
         def createDF(p):
             self.currFunc = p[0].value
+            self.globalFunc = self.currFunc
             self.tabFunc[self.currFunc] = ["void"]
             return p
         
@@ -191,6 +199,11 @@ class Parser():
         
         @self.pg.production('asignacion : ID EQUAL asignacion2')
         def asignacion(p):
+            listaPlana = self.help.aplana(p)
+            #op1 = listaPlana[0].value
+            self.quads.evalQuads(listaPlana)
+            #print(self.tabFunc[self.currFunc][1][op1])
+            #print(listaPlana)
             return p
         
         @self.pg.production('asignacion2 : asig_arr SEMI_COLON')
