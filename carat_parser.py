@@ -64,17 +64,6 @@ class Parser():
         
         @self.pg.production('vars : VAR tipo vars2')
         def vars(p):
-            # listaPlana = self.help.aplana(p)
-            # #if type is INT
-            # if(listaPlana[1].gettokentype() == "INT"):
-            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
-            # #if type is FLOAT
-            # elif(listaPlana[1].gettokentype() == "FLOAT"):
-            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
-            # #if type is CHAR
-            # else:
-            #     self.help.checkVars(listaPlana[2:], self.misVars, listaPlana[1].value)
-            # self.tabFunc[self.currFunc] = self.misVars
             return p
         
         @self.pg.production('vars2 : idAux arreglo vars3')
@@ -99,7 +88,7 @@ class Parser():
         @self.pg.production('tipo : FLOAT')
         @self.pg.production('tipo : CHAR')
         def tipo(p):
-            self.currType = p[0].value
+            self.currType = p[0].gettokentype()
             return p
         
         @self.pg.production('arreglo : def_arr')
@@ -127,7 +116,7 @@ class Parser():
         
         @self.pg.production('bpVoid : VOID')
         def bpVoid(p):
-            self.currType = p[0].value
+            self.currType = p[0].gettokentype
             return p
 
 
@@ -200,7 +189,8 @@ class Parser():
         @self.pg.production('asignacion : ID EQUAL asignacion2')
         def asignacion(p):
             listaPlana = self.help.aplana(p)
-            #op1 = listaPlana[0].value
+            op1 = listaPlana[0].value
+            print(self.tabFunc[self.currFunc][1][op1])
             self.quads.evalQuads(listaPlana)
             #print(self.tabFunc[self.currFunc][1][op1])
             #print(listaPlana)

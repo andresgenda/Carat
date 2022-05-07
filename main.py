@@ -53,8 +53,7 @@ program Carat;
 var int miVar1, miVar2, miVar3;
 
 main () {
-	miVar1 = 1 + 1;
-    miVar2 = 2 + 2;
+    miVar1 = 1 + 2;
 }
 """
 
@@ -66,3 +65,5 @@ pg.parse()
 parser = pg.get_parser()
 parser.parse(tokens)
 print("EXITO")
+
+#miVar1 = 1 + 2 * 3 * 4 + 5 / 6 * 7;
