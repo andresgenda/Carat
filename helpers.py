@@ -11,7 +11,8 @@ class Helpers:
         token_Types = {
             1 : ["ADD", "SUBSTR", "MULT", "DIVIS", "EQUAL", "MORE_THAN", "LESS_THAN", "IS_EQUAL", "NOT_EQUAL"],
             2 : ["INT", "CTE_INT", "FLOAT", "CTE_FLOAT"],
-            3 : ["ID"]
+            3 : ["ID"],
+            4 : ["EQUAL"]
         }
         for key in token_Types:
             if currTok in token_Types[key]:
@@ -32,8 +33,8 @@ class Helpers:
     
     def getOperatorType(self, currTok):
         listaTipos = {
-            "int" : ["INT", "CTE_INT"],
-            "float" : ["FLOAT", "CTE_FLOAT"]
+            "INT" : ["INT", "CTE_INT"],
+            "FLOAT" : ["FLOAT", "CTE_FLOAT"]
         }
 
         for key in listaTipos:

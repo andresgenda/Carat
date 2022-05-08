@@ -2,6 +2,7 @@ import rply
 from rply import ParserGenerator
 from helpers import Helpers
 from quadruples import Quadruples
+from stack import Stack
 
 class Parser():
     def __init__(self):
@@ -27,6 +28,9 @@ class Parser():
         self.currFunc = ""
         self.currType = ""
         self.quads = Quadruples()
+        self.stackOperandos = Stack()
+        self.stackTipos = Stack()
+        self.stackOperaciones = Stack()
 
     def parse(self):
         @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa2')
@@ -186,14 +190,19 @@ class Parser():
         def estatuto(p):
             return p
         
-        @self.pg.production('asignacion : ID EQUAL asignacion2')
+        @self.pg.production('asignacion : asigHelp asignacion2')
         def asignacion(p):
             listaPlana = self.help.aplana(p)
-            op1 = listaPlana[0].value
-            print(self.tabFunc[self.currFunc][1][op1])
-            self.quads.evalQuads(listaPlana)
-            #print(self.tabFunc[self.currFunc][1][op1])
-            #print(listaPlana)
+            varsAct = self.tabFunc[self.currFunc][1]
+            self.quads.createQuads(listaPlana, varsAct)
+            return p
+        
+        @self.pg.production('asigHelp : ID EQUAL')
+        def asigHelp(p):
+            self.stackOperandos.push(p[0].value)
+            idType = self.tabFunc[self.currFunc][1][p[0].value]
+            self.stackTipos.push(idType)
+            self.stackOperaciones.push(p[1].gettokentype())
             return p
         
         @self.pg.production('asignacion2 : asig_arr SEMI_COLON')
@@ -225,6 +234,10 @@ class Parser():
         @self.pg.production('var_cte : CTE_INT')
         @self.pg.production('var_cte : CTE_FLOAT')
         def var_cte(p):
+            listaPlana = self.help.aplana(p)
+            self.stackOperandos.push(p[0].value)
+            curr_type = self.help.getOperatorType(p[0].gettokentype())
+            self.stackTipos.push(curr_type)
             return p
         
         @self.pg.production('expresion : exp expresion2')
@@ -243,6 +256,7 @@ class Parser():
         
         @self.pg.production('expresion3 : exp')
         def expresion3(p):
+            #self.quads.createQuads(listaPlana, varsAct)
             return p
         
         @self.pg.production('exp : termino ADD exp')

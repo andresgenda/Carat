@@ -3,35 +3,35 @@ from helpers import Helpers
 class SemanticCube:
 
     diccArit = {
-        "int" : {
-            "int" : "int",
-            "float" : "float"
+        "INT" : {
+            "INT" : "INT",
+            "FLOAT" : "FLOAT"
         },
-        "float" : {
-            "int" : "float",
-            "float" : "float"
+        "FLOAT" : {
+            "INT" : "FLOAT",
+            "FLOAT" : "FLOAT"
         }
     }
     
     diccAsig = {
-        "int" : {
-            "int" : "int",
-            "float" : "float"
+        "INT" : {
+            "INT" : "INT",
+            "FLOAT" : "FLOAT"
         },
-        "float" : {
-            "int" : "error",
-            "float" : "float"
+        "FLOAT" : {
+            "INT" : "error",
+            "FLOAT" : "FLOAT"
         }
     }
 
     diccComp = {
-        "int" : {
-            "int" : "bool",
-            "float" : "bool"
+        "INT" : {
+            "INT" : "BOOL",
+            "FLOAT" : "BOOL"
         },
-        "float" : {
-            "int" : "bool",
-            "float" : "bool"
+        "FLOAT" : {
+            "INT" : "BOOL",
+            "FLOAT" : "BOOL"
         }
     }
 
@@ -40,11 +40,11 @@ class SemanticCube:
 
     def assignType(self, op1, op2, oprt_type):
         if(oprt_type == 1 or oprt_type == 2):
-            print(self.diccArit[op1][op2])
+            return self.diccArit[op1][op2]
         elif(oprt_type == 3):
-            print(self.diccAsig[op1][op2])
+            return self.diccAsig[op1][op2]
         elif(oprt_type == 4):
-            print(self.diccComp[op1][op2])
+            return self.diccComp[op1][op2]
 
     def matchTypes(self, op1_type, op2_type, operation):
 
@@ -52,10 +52,13 @@ class SemanticCube:
         
         if(oprType == -1):
             print("ERROR: Operacion no valida")
-        else:
-            op1_type = self.help.getOperatorType(op1_type)
-            op2_type = self.help.getOperatorType(op2_type)
-            self.assignType(op1_type, op2_type, oprType)
+            return "ERROR"
+        
+        op1_type = self.help.getOperatorType(op1_type)
+        op2_type = self.help.getOperatorType(op2_type)
+        return_type = self.assignType(op1_type, op2_type, oprType)
+        
+        return return_type
 
 
 #INT with INT combination
