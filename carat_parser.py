@@ -264,7 +264,6 @@ class Parser():
             return p
         
         @self.pg.production('exp : termino expSumSub exp')
-        @self.pg.production('exp : termino expSumSub exp')
         @self.pg.production('exp : termino')
         def exp(p):
             return p
@@ -276,19 +275,20 @@ class Parser():
             currTok = listaPlana[0].gettokentype()
             listaPlana = self.help.aplana(p)
             currTok = listaPlana[0].gettokentype()
-            if self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
-                currOp = self.stackOperaciones.pop()
-                self.stackOperaciones.push(currTok)
-                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
-            elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
-                currOp = self.stackOperaciones.pop()
-                self.stackOperaciones.push(currTok)
-                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
-            else:
-                self.stackOperaciones.push(currTok)
+            checkOp = self.stackOperaciones.top()
+            tipoCheck = self.help.getOperationType(checkOp)
+            while(tipoCheck == 1 or tipoCheck == 2):
+                if self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
+                    currOp = self.stackOperaciones.pop()
+                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+                elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
+                    currOp = self.stackOperaciones.pop()
+                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+                checkOp = self.stackOperaciones.top()
+                tipoCheck = self.help.getOperationType(checkOp)
+            self.stackOperaciones.push(currTok)
             return p
         
-        @self.pg.production('termino : factor factorMultDiv termino')
         @self.pg.production('termino : factor factorMultDiv termino')
         @self.pg.production('termino : factor')
         def termino(p):
