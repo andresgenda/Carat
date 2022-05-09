@@ -53,7 +53,7 @@ program Carat;
 var int miVar1, miVar2, miVar3;
 
 main () {
-    miVar1 = 1;
+    miVar1 = 1 * 2 + 3 * 4 - 4;
 }
 """
 

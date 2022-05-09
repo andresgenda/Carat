@@ -13,7 +13,37 @@ class Quadruples:
         self.scube = SemanticCube()
         self.help = Helpers()
     
-    #def assignQuad(self, )
+    def assignQuadCopy(self, miStackOpernds, miStackTps, miStackOps, misNuevosQuads):
+        while miStackOps.isEmpty() == False:
+            checkOp = miStackOps.pop()
+            currOp = checkOp
+            checkOp = self.help.getOperationType(checkOp)
+            #SUMA O RESTA
+            if checkOp != 3:
+                self.executeQuadGenCopy(currOp, miStackOpernds, miStackTps, misNuevosQuads)
+            #IGUAL
+            else:
+                op1 = miStackOpernds.pop()
+                type1 = miStackTps.pop()
+                result = miStackOpernds.pop()
+                type_result = miStackTps.pop()
+                result_type = self.scube.matchTypes(type_result, type1, currOp)
+                if result_type != "ERROR":
+                    new_quad = [currOp, op1, "", result]
+                    misNuevosQuads.append(new_quad)
+    
+    def executeQuadGenCopy(self, currOp, miStackOpernds, miStackTps, misNuevosQuads):
+        op2 = miStackOpernds.pop()
+        op1 = miStackOpernds.pop()
+        type2 = miStackTps.pop()
+        type1 = miStackTps.pop()
+        result_type = self.scube.matchTypes(type1, type2, currOp)
+        if result_type != "ERROR":
+            result = self.evalQuad(currOp, op1, op2)
+            new_quad = [currOp, op1, op2, result]
+            misNuevosQuads.append(new_quad)
+            miStackOpernds.push(result)
+            miStackTps.push(result_type)
     
     def evalQuad(self, exOp, op1, op2):
         if exOp == "ADD":
@@ -28,11 +58,21 @@ class Quadruples:
         elif exOp == "DIVIS":
             result = int(op1) / int(op2)
             return str(result)
-
     
-    def executeQuadGen(self, exOp, currTok):
-        currOp = self.stackOperaciones.pop()
-        self.stackOperaciones.push(currTok)
+    #------------------------------------------------------ A PARTIR DE AQUI CREO QUE YA NO LO VOY A USAR
+    
+    #FUNCION PARA CUANDO TENGO UNA OPERACION "="
+    def assignQuad(self, miStackOpernds, miStackTps, misNuevosQuads):
+        op1 = miStackOpernds.pop()
+        type1 = miStackTps.pop()
+        result = miStackOpernds.pop()
+        type_result = miStackTps.pop()
+        result_type = self.scube.matchTypes(type_result, type1, "EQUAL")
+        if result_type != "ERROR":
+            new_quad = ["EQUAL", op1, "", result]
+            misNuevosQuads.append(new_quad)
+
+    def executeQuadGen(self, currOp):
         op2 = self.stackOperandos.pop()
         op1 = self.stackOperandos.pop()
         type2 = self.stackTipos.pop()
@@ -47,7 +87,6 @@ class Quadruples:
 
 
     def createQuads(self, tokenList, varList):
-
         for key in tokenList:
             currVal = key.value
             currTok = key.gettokentype()
@@ -58,15 +97,21 @@ class Quadruples:
                 checkOp = self.help.getOperationType(currTok)
                 if checkOp == 1:
                     if self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
-                        self.executeQuadGen(self.stackOperaciones.top(), currTok)
+                        currOp = self.stackOperaciones.pop()
+                        self.stackOperaciones.push(currTok)
+                        self.executeQuadGen(currOp)
                     elif self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
-                        self.executeQuadGen(self.stackOperaciones.top(), currTok)
+                        currOp = self.stackOperaciones.pop()
+                        self.stackOperaciones.push(currTok)
+                        self.executeQuadGen(currOp)
                     elif self.stackOperaciones.top() == "EQUAL":
                         self.stackOperaciones.push(currTok)
                 #AQUI ES POR SI ME LLEGA UNA MULT O DIV
                 elif checkOp == 2:
                     if self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
-                        self.executeQuadGen(self.stackOperaciones.top(), currTok)
+                        currOp = self.stackOperaciones.pop()
+                        self.stackOperaciones.push(currTok)
+                        self.executeQuadGen(currOp)
                     elif self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
                         self.stackOperaciones.push(currTok)
                     elif self.stackOperaciones.top() == "EQUAL":
@@ -89,20 +134,10 @@ class Quadruples:
             currOp = checkOp
             checkOp = self.help.getOperationType(checkOp)
             #SUMA O RESTA
-            if checkOp == 1:
-                op2 = self.stackOperandos.pop()
-                op1 = self.stackOperandos.pop()
-                type2 = self.stackTipos.pop()
-                type1 = self.stackTipos.pop()
-                result_type = self.scube.matchTypes(type1, type2, currOp)
-                if result_type != "ERROR":
-                    result = op1 + op2
-                    new_quad = [currOp, op1, op2, result]
-                    self.quads.append(new_quad)
-                    self.stackOperandos.push(result)
-                    self.stackTipos.push(result_type)
+            if checkOp != 3:
+                self.executeQuadGen(currOp)
             #IGUAL
-            if checkOp == 3:
+            else:
                 op1 = self.stackOperandos.pop()
                 type1 = self.stackTipos.pop()
                 result = self.stackOperandos.pop()

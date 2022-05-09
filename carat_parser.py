@@ -31,6 +31,7 @@ class Parser():
         self.stackOperandos = Stack()
         self.stackTipos = Stack()
         self.stackOperaciones = Stack()
+        self.misQuads = []
 
     def parse(self):
         @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa2')
@@ -192,9 +193,12 @@ class Parser():
         
         @self.pg.production('asignacion : asigHelp asignacion2')
         def asignacion(p):
-            listaPlana = self.help.aplana(p)
-            varsAct = self.tabFunc[self.currFunc][1]
-            self.quads.createQuads(listaPlana, varsAct)
+            #listaPlana = self.help.aplana(p)
+            #varsAct = self.tabFunc[self.currFunc][1]
+            #self.quads.assignQuad(self.stackOperandos, self.stackTipos, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            print(self.misQuads)
+            #self.quads.createQuads(listaPlana, varsAct)
             return p
         
         @self.pg.production('asigHelp : ID EQUAL')
@@ -234,7 +238,7 @@ class Parser():
         @self.pg.production('var_cte : CTE_INT')
         @self.pg.production('var_cte : CTE_FLOAT')
         def var_cte(p):
-            listaPlana = self.help.aplana(p)
+            #listaPlana = self.help.aplana(p)
             self.stackOperandos.push(p[0].value)
             curr_type = self.help.getOperatorType(p[0].gettokentype())
             self.stackTipos.push(curr_type)
@@ -259,16 +263,50 @@ class Parser():
             #self.quads.createQuads(listaPlana, varsAct)
             return p
         
-        @self.pg.production('exp : termino ADD exp')
-        @self.pg.production('exp : termino SUBSTR exp')
+        @self.pg.production('exp : termino expSumSub exp')
+        @self.pg.production('exp : termino expSumSub exp')
         @self.pg.production('exp : termino')
         def exp(p):
             return p
         
-        @self.pg.production('termino : factor MULT termino')
-        @self.pg.production('termino : factor DIVIS termino')
+        @self.pg.production('expSumSub : ADD')
+        @self.pg.production('expSumSub : SUBSTR')
+        def expSumSub(p):
+            listaPlana = self.help.aplana(p)
+            currTok = listaPlana[0].gettokentype()
+            listaPlana = self.help.aplana(p)
+            currTok = listaPlana[0].gettokentype()
+            if self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
+                currOp = self.stackOperaciones.pop()
+                self.stackOperaciones.push(currTok)
+                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+            elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
+                currOp = self.stackOperaciones.pop()
+                self.stackOperaciones.push(currTok)
+                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+            else:
+                self.stackOperaciones.push(currTok)
+            return p
+        
+        @self.pg.production('termino : factor factorMultDiv termino')
+        @self.pg.production('termino : factor factorMultDiv termino')
         @self.pg.production('termino : factor')
         def termino(p):
+            return p
+        
+        @self.pg.production('factorMultDiv : MULT')
+        @self.pg.production('factorMultDiv : DIVIS')
+        def factorMultDiv(p):
+            listaPlana = self.help.aplana(p)
+            currTok = listaPlana[0].gettokentype()
+            if self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
+                self.stackOperaciones.push(currTok)
+            elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
+                currOp = self.stackOperaciones.pop()
+                self.stackOperaciones.push(currTok)
+                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+            else:
+                self.stackOperaciones.push(currTok)
             return p
         
         @self.pg.production('factor : OPEN_PARENTH expresion CLOSE_PARENTH')
