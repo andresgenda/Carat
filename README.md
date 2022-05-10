@@ -9,3 +9,6 @@ El avance 2 consiste en crear un directorio de funciones, en donde se guarda el 
 
 # Avance 3 - Corrección de directorio de funciones y creación de pilas
 El avance 3 consistió en corregir los puntos neurálgicos referentes a la creación y correcta asignación del directorio de funciones y sus llamadas a la tabla de variables. De la misma manera, se comenzó la creación del cubo semántico y las pilas necesarias para la futura generación de cuádruplos.
+
+# Avance 4 - Creación correcta de cubo semántico y generación de cuádruplos para operaciones aritméticas y de asignación
+Lo que se generó en el avance 4 fue la correcta creación y métodos para acceder al cubo semántico, así como la generación de funciones para identificar tipo de operaciones y el tipo de operandos. De la misma manera, se creó la clase de cuádruplos para la generación de los mismos, así como los puntos neurálgicos para realizar correctamente los cuádruplos con la prioridad adecuada de las operaciones aritméticas básicas, así como su asignación a una variable.
