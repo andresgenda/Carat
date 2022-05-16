@@ -24,7 +24,9 @@ class Helpers:
             1 : ["ADD", "SUBSTR"],
             2 : ["MULT", "DIVIS"],
             3 : ["EQUAL"],
-            4 : ["MORE_THAN", "LESS_THAN", "IS_EQUAL", "NOT_EQUAL"]
+            4 : ["MORE_THAN", "LESS_THAN", "IS_EQUAL", "NOT_EQUAL"],
+            5 : ["PRINT"],
+            6 : ["AND", "OR"]
         }
         for key in listaTipos:
             if currTok in listaTipos[key]:

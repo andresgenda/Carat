@@ -12,6 +12,8 @@ class Stack:
         return self.myStack.pop()
     
     def top(self):
+        if(self.myStack == []):
+            return -1
         return self.myStack[-1]
     
     def pr(self):

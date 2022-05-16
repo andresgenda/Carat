@@ -5,35 +5,75 @@ class SemanticCube:
     diccArit = {
         "INT" : {
             "INT" : "INT",
-            "FLOAT" : "FLOAT"
+            "FLOAT" : "FLOAT",
+            "BOOL" : "ERROR"
         },
         "FLOAT" : {
             "INT" : "FLOAT",
-            "FLOAT" : "FLOAT"
+            "FLOAT" : "FLOAT",
+            "BOOL" : "ERROR"
+        },
+        "BOOL" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "ERROR"
         }
     }
     
     diccAsig = {
         "INT" : {
             "INT" : "INT",
-            "FLOAT" : "FLOAT"
+            "FLOAT" : "FLOAT",
+            "BOOL" : "ERROR"
         },
         "FLOAT" : {
-            "INT" : "error",
-            "FLOAT" : "FLOAT"
+            "INT" : "ERROR",
+            "FLOAT" : "FLOAT",
+            "BOOL" : "ERROR"
+        },
+        "BOOL" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "ERROR"
         }
     }
 
     diccComp = {
         "INT" : {
             "INT" : "BOOL",
-            "FLOAT" : "BOOL"
+            "FLOAT" : "BOOL",
+            "BOOL" : "ERROR"
         },
         "FLOAT" : {
             "INT" : "BOOL",
-            "FLOAT" : "BOOL"
+            "FLOAT" : "BOOL",
+            "BOOL" : "ERROR"
+        },
+        "BOOL" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "ERROR"
         }
     }
+
+    diccCond = {
+        "INT" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "ERROR"
+        },
+        "FLOAT" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "ERROR"
+        },
+        "BOOL" : {
+            "INT" : "ERROR",
+            "FLOAT" : "ERROR",
+            "BOOL" : "BOOL"
+        }
+    }
+
 
     def __init__(self):
         self.help = Helpers()
@@ -45,6 +85,8 @@ class SemanticCube:
             return self.diccAsig[op1][op2]
         elif(oprt_type == 4):
             return self.diccComp[op1][op2]
+        elif(oprt_type == 6):
+            return self.diccCond[op1][op2]
 
     def matchTypes(self, op1_type, op2_type, operation):
 
