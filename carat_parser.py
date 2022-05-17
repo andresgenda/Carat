@@ -465,7 +465,7 @@ class Parser():
                 self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('ciclo_sc : FOR for_idbkpt EQUAL exp for_expbkptone TO exp DO OPEN_CURLY bloque CLOSE_CURLY')
+        @self.pg.production('ciclo_sc : FOR for_idbkpt EQUAL exp for_expbkptone TO exp for_expbkpttwo DO OPEN_CURLY bloque CLOSE_CURLY')
         def ciclo_sc(p):
             return p
         
@@ -507,6 +507,10 @@ class Parser():
                 else:
                     newQuad = ["EQUAL", curr_exp, "", vcontrol]
                     self.misQuads.append(newQuad)
+            return p
+        
+        @self.pg.production('for_expbkpttwo : ')
+        def for_expbkpttwo(p):
             return p
         
         @self.pg.production('llam_func : ID OPEN_PARENTH llam_func2')
