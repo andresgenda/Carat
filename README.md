@@ -12,3 +12,6 @@ El avance 3 consistió en corregir los puntos neurálgicos referentes a la creac
 
 # Avance 4 - Creación correcta de cubo semántico y generación de cuádruplos para operaciones aritméticas y de asignación
 Lo que se generó en el avance 4 fue la correcta creación y métodos para acceder al cubo semántico, así como la generación de funciones para identificar tipo de operaciones y el tipo de operandos. De la misma manera, se creó la clase de cuádruplos para la generación de los mismos, así como los puntos neurálgicos para realizar correctamente los cuádruplos con la prioridad adecuada de las operaciones aritméticas básicas, así como su asignación a una variable.
+
+# Avance 5 - Cuádruplos de aritmética, parentésis, comparación, condición y ciclos
+Lo que se generó para el avance 5 fue la creación de cuádruplos para operaciónes aritmética con y sin paréntesis, las operaciones de comparación, los estatutos de condicion (if y else), de impresión, de lectura de datos y ciclos (while). Asimismo se comenzo la implementación de generación de cuádruplos para el estatuto for.
