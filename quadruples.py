@@ -1,6 +1,7 @@
 from semanticube import SemanticCube
 from helpers import Helpers
 from stack import Stack
+from MemVirtual import MemVirtual
 
 class Quadruples:
 
@@ -12,6 +13,7 @@ class Quadruples:
     def __init__(self):
         self.scube = SemanticCube()
         self.help = Helpers()
+        self.memVir = MemVirtual()
 
     def printQuads(self, misNuevosQuads):
         for (i, item) in enumerate(misNuevosQuads, start=1):
@@ -62,7 +64,6 @@ class Quadruples:
                     new_quad = [currOp, op1, "", result]
                     misNuevosQuads.append(new_quad)
 
-    
     def executeQuadGenCopy(self, currOp, miStackOpernds, miStackTps, misNuevosQuads):
         op2 = miStackOpernds.pop()
         op1 = miStackOpernds.pop()
@@ -70,7 +71,8 @@ class Quadruples:
         type1 = miStackTps.pop()
         result_type = self.scube.matchTypes(type1, type2, currOp)
         if result_type != "ERROR":
-            result = self.evalQuad(currOp, op1, op2)
+            #result = self.evalQuad(currOp, op1, op2)
+            result = self.memVir.getNextDir(result_type, 2)
             new_quad = [currOp, op1, op2, result]
             misNuevosQuads.append(new_quad)
             miStackOpernds.push(result)

@@ -3,8 +3,9 @@ from rply import ParserGenerator
 from helpers import Helpers
 from quadruples import Quadruples
 from stack import Stack
-from dirFunc import dirFunc
+from DirFunc import DirFunc
 from semanticube import SemanticCube
+from MemVirtual import MemVirtual
 
 class Parser():
     def __init__(self):
@@ -24,13 +25,7 @@ class Parser():
         )
 
         self.help = Helpers()
-        #PRIMER PAR DE TAB FUNC = FUNCION
-        #SEGUNDO PAR DE TAB FUNC =
-        #   - 0 -> TIPO
-        #   - 1 -> TAB DE VARS DE FUNC
-        #TERCER PAR DE TAB FUNC = INDICE DE MI VARIABLE DENTRO DE LA TABLA
-        #self.tabFunc[][][]
-        self.tabFunc = {}
+        self.newDirFunc = DirFunc()
         self.globalFunc = ""
         self.currVarT = {}
         self.currFunc = ""
@@ -43,15 +38,18 @@ class Parser():
         self.stackJumps = Stack()
         self.counter = 0
         self.sc = SemanticCube()
+        self.memVirt = MemVirtual()
+        self.paramTable = []
 
     def parse(self):
-        @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa2')
-        @self.pg.production('programa : PROGRAM createDF SEMI_COLON programa4')
+        @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
+        @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa4')
         def programa(p):
             self.quads.printQuads(self.misQuads)
+            self.newDirFunc.pr()
             return p
 
-        @self.pg.production('programa2 : vars programa3')
+        @self.pg.production('programa2 : vars addVars programa3')
         @self.pg.production('programa2 : programa3')
         def programa2(p):
             return p
@@ -61,23 +59,35 @@ class Parser():
         def programa3(p):
             return p
         
-        @self.pg.production('programa4 : MAIN OPEN_PARENTH CLOSE_PARENTH OPEN_CURLY bloque CLOSE_CURLY')
+        @self.pg.production('programa4 : MAIN fillMain OPEN_PARENTH CLOSE_PARENTH OPEN_CURLY bloque CLOSE_CURLY')
         def programa4(p):
+            return p
+        
+        @self.pg.production('mainStart : ')
+        def mainStart(p):
+            self.stackJumps.push(0)
+            newQuad = ["GOTO", "", "", ""]
+            self.misQuads.append(newQuad)
+            return p
+        
+        @self.pg.production('fillMain : ')
+        def fillMain(p):
+            currJump = len(self.misQuads)+1
+            self.stackJumps.push(currJump)
+            self.quads.fillGoto(self.stackJumps, self.misQuads)
             return p
 
         @self.pg.production('createDF : ID')
         def createDF(p):
             self.currFunc = p[0].value
             self.globalFunc = self.currFunc
-            self.tabFunc[self.currFunc] = ["VOID"]
+            self.newDirFunc.addFunc(self.currFunc, "VOID")
             return p
         
         @self.pg.production('vars : VAR tipo vars2')
         def vars(p):
             #Cuando se terminan de declarar las variables, se agrega la tabla de variables
             #al la funcion actual, y la tabla de variables se resetea.
-            self.tabFunc[self.currFunc].append(self.currVarT)
-            self.currVarT = {}
             return p
         
         @self.pg.production('vars2 : idAux arreglo vars3')
@@ -89,13 +99,29 @@ class Parser():
         def idAux(p):
             if p[0].value in self.currVarT:
                 raise ValueError("Declaracion multiple de variables")
-            self.currVarT[p[0].value] = self.currType
+            #PUES AQUI PONER LA ACTUAL DIR
+            if self.currFunc == self.globalFunc:
+                currDir = self.memVirt.getNextDir(self.currType, 0)
+            else:
+                currDir = self.memVirt.getNextDir(self.currType, 1)
+            self.currVarT[p[0].value] = [self.currType, currDir]
             return p
         
         @self.pg.production('vars3 : COMMA vars2')
         @self.pg.production('vars3 : SEMI_COLON vars')
         @self.pg.production('vars3 : SEMI_COLON')
         def vars3(p):
+            return p
+
+        @self.pg.production('addVars : ')
+        def addVars(p):
+            #NEW
+            self.newDirFunc.addVar(self.currFunc, self.currVarT)
+            self.newDirFunc.addParams(self.currFunc, self.paramTable)
+            #AQUI CALCULAR NUMERO DE VARIABLES LOCALES (INLCUYENDO
+            # PARAMETROS) Y CUANTAS VARIABLES TEMPORALES UTILICE
+            self.currVarT = {}
+            self.paramTable = []
             return p
 
         @self.pg.production('tipo : INT')
@@ -124,8 +150,11 @@ class Parser():
         def funcion(p):
             #Al terminar la funcion actual, la funcion actual vuelve a ser la global
             self.currFunc = self.globalFunc
+            self.memVirt.resetLocalVars()
+            newQuad = ["ENDFUNC", "", "", ""]
+            self.misQuads.append(newQuad)
             return p
-        
+
         @self.pg.production('f_void : bpVoid init OPEN_CURLY f_void2')
         def f_void(p):
             return p
@@ -136,7 +165,7 @@ class Parser():
             return p
 
 
-        @self.pg.production('f_void2 : vars f_void3')
+        @self.pg.production('f_void2 : vars addVars f_void3')
         @self.pg.production('f_void2 : f_void3')
         def f_void2(p):
             return p
@@ -149,7 +178,7 @@ class Parser():
         def f_ret(p):
             return p
         
-        @self.pg.production('f_ret2 : vars f_ret3')
+        @self.pg.production('f_ret2 : vars addVars f_ret3')
         @self.pg.production('f_ret2 : f_ret3')
         def f_ret2(p):
             return p
@@ -167,19 +196,35 @@ class Parser():
         #directorio junto con su tipo
         @self.pg.production('bpCurrFunc : ID')
         def bpCurrFunc(p):
-            if p[0].value in self.tabFunc:
+            if p[0].value in self.newDirFunc.misFunciones:
                 raise ValueError("Nombre de funcion ya existe")
             self.currFunc = p[0].value
-            self.tabFunc[self.currFunc] = [self.currType]
+            #NUEVA TABLA DE FUNCIONES
+            self.newDirFunc.addFunc(self.currFunc, self.currType)
             return p
         
-        @self.pg.production('init2 : tipo ID COMMA init2')
-        @self.pg.production('init2 : tipo ID init3')
+        @self.pg.production('init2 : addParam COMMA init2')
+        @self.pg.production('init2 : addParam init3')
         def init2(p):
             return p
         
         @self.pg.production('init3 : CLOSE_PARENTH')
         def init3(p):
+            return p
+        
+        @self.pg.production('addParam : tipo ID')
+        def addParam(p):
+            listaPlana = self.help.aplana(p)
+            self.currType = listaPlana[0].gettokentype()
+            if listaPlana[1].value in self.currVarT:
+                raise ValueError("Declaracion multiple de variables")
+            #PUES AQUI PONER LA ACTUAL DIR
+            if self.currFunc == self.globalFunc:
+                currDir = self.memVirt.getNextDir(self.currType, 0)
+            else:
+                currDir = self.memVirt.getNextDir(self.currType, 1)
+            self.paramTable.append(self.currType)
+            self.currVarT[listaPlana[1].value] = [self.currType, currDir]
             return p
         
         @self.pg.production('bloque : estatuto')
@@ -205,8 +250,14 @@ class Parser():
         
         @self.pg.production('asigHelp : ID EQUAL')
         def asigHelp(p):
-            self.stackOperandos.push(p[0].value)
-            idType = self.tabFunc[self.currFunc][1][p[0].value]
+            curr_id = p[0].value
+            misFuncs = self.newDirFunc.misFunciones
+            varFunction = self.help.getVarFunction(misFuncs, curr_id, self.currFunc, self.globalFunc)
+            if varFunction == -1:
+                raise ValueError("Variable no declarada")
+            curr_idmem = self.newDirFunc.getVarMem(varFunction, curr_id)
+            self.stackOperandos.push(curr_idmem)
+            idType = self.newDirFunc.getIDType(varFunction, curr_id)
             self.stackTipos.push(idType)
             self.stackOperaciones.push(p[1].gettokentype())
             return p
@@ -240,8 +291,19 @@ class Parser():
         @self.pg.production('var_cte : CTE_INT')
         @self.pg.production('var_cte : CTE_FLOAT')
         def var_cte(p):
-            self.stackOperandos.push(p[0].value)
-            curr_type = self.help.getOperatorType(p[0].gettokentype())
+            myToken = p[0].gettokentype()
+            if myToken == 'CTE_INT' or myToken == 'CTE_FLOAT':
+                self.memVirt.assignCte(myToken, p[0].value)
+                dirCte = self.memVirt.getCteDir(p[0].value, myToken)
+                curr_type = self.help.getOperatorType(p[0].gettokentype())
+            else:
+                curr_id = p[0].value
+                varFunction = self.help.getVarFunction(self.newDirFunc, curr_id, self.currFunc, self.globalFunc)
+                if varFunction == -1:
+                    raise ValueError("Variable no declarada")
+                dirCte = self.newDirFunc.getVarMem(varFunction, curr_id)
+                curr_type = self.newDirFunc.getIDType(varFunction, curr_id)
+            self.stackOperandos.push(dirCte)
             self.stackTipos.push(curr_type)
             return p
         
@@ -397,7 +459,7 @@ class Parser():
         @self.pg.production('lecturaAux : ID')
         def lecturaAux(p):
             curr_var = p[0].value
-            if curr_var in self.tabFunc[self.currFunc][1]:
+            if curr_var in self.newDirFunc.getVars(self.currFunc):
                 self.quads.read_writeQuad("INPUT", curr_var, self.misQuads)
             else:
                 raise ValueError("Variable no declarada")
@@ -465,26 +527,50 @@ class Parser():
                 self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('ciclo_sc : FOR for_idbkpt EQUAL exp for_expbkptone TO exp for_expbkpttwo DO OPEN_CURLY bloque CLOSE_CURLY')
+        @self.pg.production('ciclo_sc : FOR for_idbkpt EQUAL expFor exp for_expbkptone TO expFor exp for_expbkpttwo DO OPEN_CURLY bloque CLOSE_CURLY')
         def ciclo_sc(p):
+            vcontrol = self.stackOperandos.pop()
+            self.stackTipos.pop()
+            result = self.quads.memVir.getNextDir("INT", 2)
+            newQuad = ["ADD", vcontrol, 1, result]
+            self.misQuads.append(newQuad)
+            newQuad = ["EQUAL", result, "", vcontrol]
+            self.misQuads.append(newQuad)
+            newQuad = ["GOTO", "", "", ""]
+            self.misQuads.append(newQuad)
+            jumpToPush = len(self.misQuads) + 1
+            self.stackJumps.push(jumpToPush)
+            self.quads.fillGoto(self.stackJumps, self.misQuads)
+            returnWhile = len(self.misQuads) - 1
+            self.stackJumps.push(returnWhile)
+            self.quads.fillGotoWhile(self.stackJumps, self.misQuads)
+            return p
+        
+        @self.pg.production('expFor : ')
+        def expFor(p):
+            self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
         @self.pg.production('for_idbkpt : ID')
         def for_idbkpt(p):
             curr_id = p[0].value
             #VALIDAR QUE EL ID SI EXISTA Y QUE SEA DE TIPO NUMERICO
-            if curr_id in self.tabFunc[self.currFunc][1]:
-                if self.tabFunc[self.currFunc][1][curr_id] == "INT":
-                    curr_type = self.tabFunc[self.currFunc][1][curr_id]
-                    self.stackOperandos.push(curr_id)
+            if curr_id in self.newDirFunc.getVars(self.currFunc):
+                if self.newDirFunc.getIDType(self.currFunc, curr_id) == "INT":
+                    curr_id = p[0].value
+                    dirCte = self.newDirFunc.getVarMem(self.currFunc, curr_id)
+                    curr_type = self.newDirFunc.getIDType(self.currFunc, curr_id)
+                    self.stackOperandos.push(dirCte)
                     self.stackTipos.push(curr_type)
                 else:
                     raise ValueError("Type-mismathc")
             else:
-                if curr_id in self.tabFunc[self.globalFunc][1]:
-                    if self.tabFunc[self.globalFunc][1][curr_id] == "INT":
-                        curr_type = self.tabFunc[self.globalFunc][1][curr_id]
-                        self.stackOperandos.push(curr_id)
+                if curr_id in self.newDirFunc.getVars(self.globalFunc):
+                    if self.newDirFunc.getIDType(self.globalFunc, curr_id) == "INT":
+                        curr_id = p[0].value
+                        dirCte = self.newDirFunc.getVarMem(self.globalFunc, curr_id)
+                        curr_type = self.newDirFunc.getIDType(self.globalFunc, curr_id)
+                        self.stackOperandos.push(dirCte)
                         self.stackTipos.push(curr_type)
                     else:
                         raise ValueError("Type-mismathc")
@@ -494,6 +580,7 @@ class Parser():
         
         @self.pg.production('for_expbkptone : ')
         def for_expbkptone(p):
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
             exp_type = self.stackTipos.pop()
             if exp_type != "INT":
                 raise ValueError("Type-mismatch")
@@ -511,6 +598,28 @@ class Parser():
         
         @self.pg.production('for_expbkpttwo : ')
         def for_expbkpttwo(p):
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            exp_type = self.stackTipos.pop()
+            if exp_type != "INT":
+                raise ValueError("Type-mismatch")
+            else:
+                curr_exp = self.stackOperandos.pop()
+                vfinal = self.stackOperandos.top()
+                control_type = self.stackTipos.top()
+                tipo_res = self.sc.matchTypes(control_type, exp_type, "LESS_THAN")
+                if tipo_res == "ERROR":
+                    raise ValueError("Type-mismatch")
+                else:
+                    #AQUI ME URRRRRRGGEEEEE PONER UNA DIRECCION DE TEMP PARA LOS LESS_THAN
+                    result = self.memVirt.getNextDir(tipo_res, 2)
+                    newQuad = ["LESS_THAN", vfinal, curr_exp, result]
+                    self.misQuads.append(newQuad)
+                    currJump = len(self.misQuads)
+                    self.stackJumps.push(currJump)
+                    newQuad = ["GOTOF", result, "", ""]
+                    self.misQuads.append(newQuad)
+                    currJump = len(self.misQuads) - 1
+                    self.stackJumps.push(currJump)
             return p
         
         @self.pg.production('llam_func : ID OPEN_PARENTH llam_func2')

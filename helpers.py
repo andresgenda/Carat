@@ -36,10 +36,19 @@ class Helpers:
     def getOperatorType(self, currTok):
         listaTipos = {
             "INT" : ["INT", "CTE_INT"],
-            "FLOAT" : ["FLOAT", "CTE_FLOAT"]
+            "FLOAT" : ["FLOAT", "CTE_FLOAT"],
+            "STRING" : ["STRING"],
+            "BOOL" : ["BOOL"]
         }
 
         for key in listaTipos:
             if currTok in listaTipos[key]:
                 return key
-            return -1
+        return -1
+    
+    def getVarFunction(self, myFunctions, myVar, currFunc, globalFunc):
+        if myVar in myFunctions[currFunc]["vars"]:
+            return currFunc
+        elif myVar in myFunctions[globalFunc][1]:
+            return globalFunc
+        return -1

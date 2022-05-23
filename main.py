@@ -51,17 +51,11 @@ text_input2 = """
 program Carat;
 
 var int miVar1, miVar2, miVar3;
-
-void func pinta() {
-	var int x;
-	x = 1;
-}
+var float miVar4;
 
 main () {
-    input(miVar1);
-    print(1 + 1);
-    miVar2 = (2 + 2) * 2 - (3 + 5 * (1 + 1));
-    miVar1 = 1 * 2 + 3 * 4 - 4;
+    miVar2 = 2;
+    miVar3 = miVar4;
 }
 """
 
@@ -73,11 +67,11 @@ var int miVar1, miVar2, miVar3;
 main () {
     miVar1 = 1 + 2 * (3 - 2 / 1) * 4;
     miVar2 = 2 - 1;
-    while(2 * 2 - 1 == 2 * 1 / (2+3)) do {
+    while(miVar2 * 2 - 1 == 2 * 1 / (2+3)) do {
         miVar2 = 1 * 2 +1;
         if(3 < 3){
             miVar3 = 2 + 2;
-            while(6 > 1 + 2) do {
+            while(miVar3 > 1 + 2) do {
                 print(1 + 2 * 4, 5-1);
                 miVar3 = 3 - 1;
             }
@@ -97,11 +91,11 @@ program Carat;
 
 var int miVar1, miVar2, miVar3;
 
-void func pinta() {
+void func pinta(int y) {
     var int x;
-    x = 1 + 1 * (2 - 1);
-    x = 1 + 2;
-	for miVar1 = 1 to 5 do {
+    x = 1.5 + 1 * (2 - 1);
+    y = 1 + 2;
+    for miVar1 = 1 to 5 do {
         print("holis");
     }
 }
