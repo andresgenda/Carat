@@ -7,7 +7,9 @@ class DirFunc:
         self.misFunciones[newFunc] = {
             "tipo" : newType,
             "startDir" : "",
-            "size" : "",
+            "numParams" : "",
+            "numLocals" : "",
+            "numTemps" : "",
             "params" : [],
             "vars" : {}
         }
@@ -21,6 +23,11 @@ class DirFunc:
     def addParams(self, currFunc, currParams):
         self.misFunciones[currFunc]["params"] = currParams
     
+    def getParam(self, currFunc, currIdx):
+        if currIdx >= len(self.misFunciones[currFunc]["params"]):
+            return -1
+        return self.misFunciones[currFunc]["params"][currIdx]
+    
     def getVarMem(self, currFunc, currID):
         return self.misFunciones[currFunc]["vars"][currID][1]
     
@@ -29,12 +36,20 @@ class DirFunc:
     
     def getVars(self, currFunc):
         return self.misFunciones[currFunc]["vars"]
+    
+    def setStart(self, currFunc, start):
+        self.misFunciones[currFunc]["startDir"] = start
+    
+    def getStart(self, currFunc):
+        return self.misFunciones[currFunc]["startDir"]
 
     def pr(self):
         for key in self.misFunciones:
             print("----------- FUNCION", key, "-----------")
             print("Tipo:", self.misFunciones[key]["tipo"])
             print("Direccion de inicio:", self.misFunciones[key]["startDir"])
-            print("Tamaño:", self.misFunciones[key]["size"])
+            print("Numero de parametros:", self.misFunciones[key]["numParams"])
+            print("Numero de variables locales:", self.misFunciones[key]["numLocals"])
+            print("Numero de temporales:", self.misFunciones[key]["numTemps"])
             print("Parametros:", self.misFunciones[key]["params"])
             print("Variables:", self.misFunciones[key]["vars"])

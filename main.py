@@ -91,7 +91,7 @@ program Carat;
 
 var int miVar1, miVar2, miVar3;
 
-void func pinta(int y) {
+void func Pinta(int y, int z) {
     var int x;
     x = 1.5 + 1 * (2 - 1);
     y = 1 + 2;
@@ -101,7 +101,9 @@ void func pinta(int y) {
 }
 
 main () {
-    print("Adios");
+    print("Main");
+    miVar2 = 1 + 1;
+    Pinta(2 + 2, 4);
 }
 """
 

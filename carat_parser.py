@@ -40,6 +40,8 @@ class Parser():
         self.sc = SemanticCube()
         self.memVirt = MemVirtual()
         self.paramTable = []
+        self.paramCounter = 0
+        self.accessFunc = ""
 
     def parse(self):
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
@@ -73,6 +75,7 @@ class Parser():
         @self.pg.production('fillMain : ')
         def fillMain(p):
             currJump = len(self.misQuads)+1
+            self.newDirFunc.setStart(self.globalFunc, currJump)
             self.stackJumps.push(currJump)
             self.quads.fillGoto(self.stackJumps, self.misQuads)
             return p
@@ -190,6 +193,8 @@ class Parser():
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init2')
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init3')
         def init(p):
+            star_dir = len(self.misQuads)+1
+            self.newDirFunc.setStart(self.currFunc, star_dir)
             return p
         
         #Se cambia la funcion actual por la que viene llegando, y se agrega al
@@ -622,18 +627,46 @@ class Parser():
                     self.stackJumps.push(currJump)
             return p
         
-        @self.pg.production('llam_func : ID OPEN_PARENTH llam_func2')
+        @self.pg.production('llam_func : verifyFuncID OPEN_PARENTH llam_func2')
         def llam_func(p):
+            if self.newDirFunc.getParam(self.accessFunc, self.paramCounter) != -1:
+                raise ValueError("Faltan variables por declarar")
+            startAddress = self.newDirFunc.getStart(self.accessFunc)
+            newQuad = ["GOSUB", self.accessFunc, "", startAddress]
+            self.misQuads.append(newQuad)
+            self.accessFunc = ""
             return p
         
-        @self.pg.production('llam_func2 : exp llam_func3')
+        @self.pg.production('verifyFuncID : ID')
+        def verifyFuncID(p):
+            curr_id = p[0].value
+            if curr_id not in self.newDirFunc.misFunciones:
+                raise ValueError("Funcion no declarada")
+            self.accessFunc = curr_id
+            newQuad = ["ERA", "", "", curr_id]
+            self.misQuads.append(newQuad)
+            return p
+        
+        @self.pg.production('llam_func2 : exp checkParam llam_func3')
         @self.pg.production('llam_func2 : CLOSE_PARENTH SEMI_COLON')
         def llam_func2(p):
             return p
         
-        @self.pg.production('llam_func3 : COMMA exp llam_func3')
+        @self.pg.production('llam_func3 : COMMA exp checkParam llam_func3')
         @self.pg.production('llam_func3 : CLOSE_PARENTH SEMI_COLON')
         def llam_func3(p):
+            return p
+        
+        @self.pg.production('checkParam : ')
+        def checkParam(p):
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            arg = self.stackOperandos.pop()
+            curr_type = self.stackTipos.pop()
+            if curr_type != self.newDirFunc.getParam(self.accessFunc, self.paramCounter):
+                raise ValueError("Type-mismatch in function")
+            newQuad = ["PARAM", arg, "", "Param"]
+            self.misQuads.append(newQuad)
+            self.paramCounter += 1
             return p
         
         @self.pg.production('llam_esp : linea')
