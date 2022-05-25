@@ -15,3 +15,6 @@ Lo que se generó en el avance 4 fue la correcta creación y métodos para acced
 
 # Avance 5 - Cuádruplos de aritmética, parentésis, comparación, condición y ciclos
 Lo que se generó para el avance 5 fue la creación de cuádruplos para operaciónes aritmética con y sin paréntesis, las operaciones de comparación, los estatutos de condicion (if y else), de impresión, de lectura de datos y ciclos (while). Asimismo se comenzo la implementación de generación de cuádruplos para el estatuto for.
+
+# Avance 6 - Generación de código de ciclos completa, generación de código de funciones, asignación de memoria virtual, refactorización de directorio de funciones
+Lo que se realizó para el avance 6 fue completar la generación de código de ciclos (for). Asimismo, se término la generación de código para llamadas a funciones, así como su validación de parámetros y tipos utilizando una tabla de parámetros. De la misma forma, se asigno un espacio de memoria a cada variable, dependiendo de su scope (global, local, temporal y constante) y de su tipo. Se cambió la creación de cuádruplos para que ahora tomen en cuenta las direcciones de cada variable para cada operación. Finalmente, se refactorizó el directorio de funciones y se creó una clase especial para su uso.
