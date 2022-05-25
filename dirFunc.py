@@ -42,6 +42,10 @@ class DirFunc:
     
     def getStart(self, currFunc):
         return self.misFunciones[currFunc]["startDir"]
+    
+    def setNumParams(self, currFunc):
+        size = len(self.misFunciones[currFunc]["params"])
+        self.misFunciones[currFunc]["numParams"] = size
 
     def pr(self):
         for key in self.misFunciones:

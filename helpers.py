@@ -37,7 +37,7 @@ class Helpers:
         listaTipos = {
             "INT" : ["INT", "CTE_INT"],
             "FLOAT" : ["FLOAT", "CTE_FLOAT"],
-            "STRING" : ["STRING"],
+            "STRING" : ["STRING", "CTE_STRING"],
             "BOOL" : ["BOOL"]
         }
 

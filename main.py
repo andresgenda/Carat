@@ -101,6 +101,7 @@ void func Pinta(int y, int z) {
 }
 
 main () {
+    input(miVar3);
     print("Main");
     miVar2 = 1 + 1;
     Pinta(2 + 2, 4);

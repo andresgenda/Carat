@@ -120,7 +120,6 @@ class Parser():
         def addVars(p):
             #NEW
             self.newDirFunc.addVar(self.currFunc, self.currVarT)
-            self.newDirFunc.addParams(self.currFunc, self.paramTable)
             #AQUI CALCULAR NUMERO DE VARIABLES LOCALES (INLCUYENDO
             # PARAMETROS) Y CUANTAS VARIABLES TEMPORALES UTILICE
             self.currVarT = {}
@@ -194,7 +193,9 @@ class Parser():
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init3')
         def init(p):
             star_dir = len(self.misQuads)+1
+            self.newDirFunc.addParams(self.currFunc, self.paramTable)
             self.newDirFunc.setStart(self.currFunc, star_dir)
+            self.newDirFunc.setNumParams(self.currFunc)
             return p
         
         #Se cambia la funcion actual por la que viene llegando, y se agrega al
@@ -465,7 +466,8 @@ class Parser():
         def lecturaAux(p):
             curr_var = p[0].value
             if curr_var in self.newDirFunc.getVars(self.currFunc):
-                self.quads.read_writeQuad("INPUT", curr_var, self.misQuads)
+                curr_add = self.newDirFunc.getVarMem(self.currFunc, curr_var)
+                self.quads.read_writeQuad("INPUT", curr_add, self.misQuads)
             else:
                 raise ValueError("Variable no declarada")
             return p
@@ -492,7 +494,10 @@ class Parser():
         @self.pg.production('escritura_str : CTE_STRING')
         def escritura_str(p):
             curr_val = p[0].value
-            self.quads.read_writeQuad("PRINT", curr_val, self.misQuads)
+            myToken = p[0].gettokentype()
+            self.memVirt.assignCte(myToken, curr_val)
+            dirCte = self.memVirt.getCteDir(curr_val, myToken)
+            self.quads.read_writeQuad("PRINT", dirCte, self.misQuads)
             return p
 
         @self.pg.production('escritura3 : COMMA escritura2')

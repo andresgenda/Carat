@@ -7,8 +7,6 @@ class MemVirtual:
     #Temporales -> 3000 - 3999
     #Constantes -> 4000 - 4999
     def __init__(self):
-        self.memgral = [1000, 2000, 3000, 4000]
-        self.maxV = 250
         self.help = Helpers()
         self.myMemory = self.initMemoria()
         self.myConstants = [[],[],[],[]]
@@ -64,8 +62,10 @@ class MemVirtual:
             return index + 4000
         elif segment == "FLOAT":
             return index + 4250
-        else:
+        elif segment == "STRING":
             return index + 4500
+        else:
+            return index + 4750
     
     def resetLocalVars(self):
         self.myMemory[2] = [2000, 2250, 2500, 2750]
