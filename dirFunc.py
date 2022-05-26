@@ -7,9 +7,13 @@ class DirFunc:
         self.misFunciones[newFunc] = {
             "tipo" : newType,
             "startDir" : "",
-            "numParams" : "",
-            "numLocals" : "",
-            "numTemps" : "",
+            "numParamsInt" : 0,
+            "numParamsFl" : 0,
+            "numLocalsInt" : 0,
+            "numLocalsFl" : 0,
+            "numTempsInt" : 0,
+            "numTempsFl" : 0,
+            "numTempsBl" : 0,
             "params" : [],
             "vars" : {}
         }
@@ -44,16 +48,38 @@ class DirFunc:
         return self.misFunciones[currFunc]["startDir"]
     
     def setNumParams(self, currFunc):
-        size = len(self.misFunciones[currFunc]["params"])
-        self.misFunciones[currFunc]["numParams"] = size
+        for key in self.misFunciones[currFunc]["params"]:
+            if key == "INT":
+                self.misFunciones[currFunc]["numParamsInt"] += 1
+            elif key == "FLOAT":
+                self.misFunciones[currFunc]["numParamsFl"] += 1
+    
+    def setNumVars(self, currFunc):
+        for key in self.misFunciones[currFunc]["vars"]:
+            if self.misFunciones[currFunc]["vars"][key][0] == "INT":
+                self.misFunciones[currFunc]["numLocalsInt"] += 1
+            elif self.misFunciones[currFunc]["vars"][key][0] == "FLOAT":
+                self.misFunciones[currFunc]["numLocalsFl"] += 1
+
+    def setNumTemps(self, currFunc, currType):
+        if currType == "INT":
+            self.misFunciones[currFunc]["numTempsInt"] += 1
+        elif currType == "FLOAT":
+            self.misFunciones[currFunc]["numTempsFl"] += 1
+        elif currType == "BOOL":
+            self.misFunciones[currFunc]["numTempsBl"] += 1
 
     def pr(self):
         for key in self.misFunciones:
             print("----------- FUNCION", key, "-----------")
             print("Tipo:", self.misFunciones[key]["tipo"])
             print("Direccion de inicio:", self.misFunciones[key]["startDir"])
-            print("Numero de parametros:", self.misFunciones[key]["numParams"])
-            print("Numero de variables locales:", self.misFunciones[key]["numLocals"])
-            print("Numero de temporales:", self.misFunciones[key]["numTemps"])
+            print("Numero de parametros enteras:", self.misFunciones[key]["numParamsInt"])
+            print("Numero de parametros flotantes:", self.misFunciones[key]["numParamsFl"])
+            print("Numero de variables locales enteras:", self.misFunciones[key]["numLocalsInt"])
+            print("Numero de variables locales flotantes:", self.misFunciones[key]["numLocalsFl"])
+            print("Numero de temporales enteras:", self.misFunciones[key]["numTempsInt"])
+            print("Numero de temporales flotantes:", self.misFunciones[key]["numTempsFl"])
+            print("Numero de temporales booleanas:", self.misFunciones[key]["numTempsBl"])
             print("Parametros:", self.misFunciones[key]["params"])
             print("Variables:", self.misFunciones[key]["vars"])

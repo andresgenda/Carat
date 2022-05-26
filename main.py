@@ -87,9 +87,10 @@ main () {
 """
 
 text_input4 = """
-program Carat;
+program Carat; 
 
 var int miVar1, miVar2, miVar3;
+var float miFloat;
 
 void func Pinta(int y, int z) {
     var int x;

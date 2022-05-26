@@ -74,6 +74,7 @@ class Parser():
         
         @self.pg.production('fillMain : ')
         def fillMain(p):
+            self.newDirFunc.setNumVars(self.currFunc)
             currJump = len(self.misQuads)+1
             self.newDirFunc.setStart(self.globalFunc, currJump)
             self.stackJumps.push(currJump)
@@ -151,6 +152,7 @@ class Parser():
         @self.pg.production('funcion : f_ret')
         def funcion(p):
             #Al terminar la funcion actual, la funcion actual vuelve a ser la global
+            self.newDirFunc.setNumVars(self.currFunc)
             self.currFunc = self.globalFunc
             self.memVirt.resetLocalVars()
             newQuad = ["ENDFUNC", "", "", ""]
@@ -251,7 +253,7 @@ class Parser():
         
         @self.pg.production('asignacion : asigHelp asignacion2')
         def asignacion(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
         @self.pg.production('asigHelp : ID EQUAL')
@@ -324,7 +326,7 @@ class Parser():
         @self.pg.production('expresionComp : IS_EQUAL')
         @self.pg.production('expresionComp : NOT_EQUAL')
         def expresionComp(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             currOp = p[0].gettokentype()
             self.stackOperaciones.push(currOp)
             return p
@@ -332,7 +334,7 @@ class Parser():
         @self.pg.production('expresionCond : AND expresion3')
         @self.pg.production('expresionCond : OR expresion3')
         def expresionCond(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             currOp = p[0].gettokentype()
             self.stackOperaciones.push(currOp)
             return p
@@ -356,10 +358,10 @@ class Parser():
             while(tipoCheck == 1 or tipoCheck == 2):
                 if self.stackOperaciones.top() == "ADD" or self.stackOperaciones.top() == "SUBSTR":
                     currOp = self.stackOperaciones.pop()
-                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
                 elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
                     currOp = self.stackOperaciones.pop()
-                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+                    self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
                 checkOp = self.stackOperaciones.top()
                 tipoCheck = self.help.getOperationType(checkOp)
             self.stackOperaciones.push(currTok)
@@ -380,7 +382,7 @@ class Parser():
             elif self.stackOperaciones.top() == "MULT" or self.stackOperaciones.top() == "DIVIS":
                 currOp = self.stackOperaciones.pop()
                 self.stackOperaciones.push(currTok)
-                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads)
+                self.quads.executeQuadGenCopy(currOp, self.stackOperandos, self.stackTipos, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             else:
                 self.stackOperaciones.push(currTok)
             return p
@@ -397,7 +399,7 @@ class Parser():
         
         @self.pg.production('cl_parenth : CLOSE_PARENTH')
         def cl_parenth(p):
-            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
         @self.pg.production('factor3 : var_cte')
@@ -426,7 +428,7 @@ class Parser():
         
         @self.pg.production('if_bkpt : ')
         def if_bkpt(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             opEval = self.stackOperandos.pop()
             op_type = self.stackTipos.pop()
             if op_type != "BOOL":
@@ -488,7 +490,7 @@ class Parser():
         
         @self.pg.production('escritura_exp : exp')
         def escritura_exp(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
         @self.pg.production('escritura_str : CTE_STRING')
@@ -525,7 +527,7 @@ class Parser():
         
         @self.pg.production('while_cond : ')
         def while_cond(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             opEval = self.stackOperandos.pop()
             op_type = self.stackTipos.pop()
             if op_type != "BOOL":
@@ -541,7 +543,8 @@ class Parser():
         def ciclo_sc(p):
             vcontrol = self.stackOperandos.pop()
             self.stackTipos.pop()
-            result = self.quads.memVir.getNextDir("INT", 2)
+            result = self.memVirt.getNextDir("INT", 2)
+            self.newDirFunc.setNumTemps(self.currFunc, "INT")
             newQuad = ["ADD", vcontrol, 1, result]
             self.misQuads.append(newQuad)
             newQuad = ["EQUAL", result, "", vcontrol]
@@ -590,7 +593,7 @@ class Parser():
         
         @self.pg.production('for_expbkptone : ')
         def for_expbkptone(p):
-            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             exp_type = self.stackTipos.pop()
             if exp_type != "INT":
                 raise ValueError("Type-mismatch")
@@ -608,7 +611,7 @@ class Parser():
         
         @self.pg.production('for_expbkpttwo : ')
         def for_expbkpttwo(p):
-            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             exp_type = self.stackTipos.pop()
             if exp_type != "INT":
                 raise ValueError("Type-mismatch")
@@ -620,8 +623,8 @@ class Parser():
                 if tipo_res == "ERROR":
                     raise ValueError("Type-mismatch")
                 else:
-                    #AQUI ME URRRRRRGGEEEEE PONER UNA DIRECCION DE TEMP PARA LOS LESS_THAN
                     result = self.memVirt.getNextDir(tipo_res, 2)
+                    self.newDirFunc.setNumTemps(self.currFunc, tipo_res)
                     newQuad = ["LESS_THAN", vfinal, curr_exp, result]
                     self.misQuads.append(newQuad)
                     currJump = len(self.misQuads)
@@ -664,7 +667,7 @@ class Parser():
         
         @self.pg.production('checkParam : ')
         def checkParam(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads)
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             arg = self.stackOperandos.pop()
             curr_type = self.stackTipos.pop()
             if curr_type != self.newDirFunc.getParam(self.accessFunc, self.paramCounter):
