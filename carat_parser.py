@@ -1,4 +1,5 @@
 import rply
+import numpy as np
 from rply import ParserGenerator
 from helpers import Helpers
 from quadruples import Quadruples
@@ -47,8 +48,14 @@ class Parser():
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa4')
         def programa(p):
+            newQuad = ["END", "", "", ""]
+            self.misQuads.append(newQuad)
             self.quads.printQuads(self.misQuads)
+            self.help.getOperationNumber(self.misQuads)
             self.newDirFunc.pr()
+            quadsExport = np.array(self.misQuads)
+            np.savetxt('ExportedFiles/exportedQuads.csv', quadsExport, delimiter=',', fmt="%s")
+            self.memVirt.exportCtes()
             return p
 
         @self.pg.production('programa2 : vars addVars programa3')
@@ -154,7 +161,7 @@ class Parser():
             #Al terminar la funcion actual, la funcion actual vuelve a ser la global
             self.newDirFunc.setNumVars(self.currFunc)
             self.currFunc = self.globalFunc
-            self.memVirt.resetLocalVars()
+            self.memVirt.resetVars()
             newQuad = ["ENDFUNC", "", "", ""]
             self.misQuads.append(newQuad)
             return p
@@ -306,7 +313,8 @@ class Parser():
                 curr_type = self.help.getOperatorType(p[0].gettokentype())
             else:
                 curr_id = p[0].value
-                varFunction = self.help.getVarFunction(self.newDirFunc, curr_id, self.currFunc, self.globalFunc)
+                misFuncs = self.newDirFunc.misFunciones
+                varFunction = self.help.getVarFunction(misFuncs, curr_id, self.currFunc, self.globalFunc)
                 if varFunction == -1:
                     raise ValueError("Variable no declarada")
                 dirCte = self.newDirFunc.getVarMem(varFunction, curr_id)

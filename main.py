@@ -95,7 +95,7 @@ var float miFloat;
 void func Pinta(int y, int z) {
     var int x;
     x = 1.5 + 1 * (2 - 1);
-    y = 1 + 2;
+    y = 1 + 8;
     for miVar1 = 1 to 5 do {
         print("holis");
     }
@@ -109,8 +109,19 @@ main () {
 }
 """
 
+text_input5 = """
+program Carat; 
+
+var int miVar1, miVar2, miVar3;
+var float miFloat;
+
+main () {
+    miVar2 = miVar1 * 2;
+}
+"""
+
 lexer = Lexer().get_lexer()
-tokens = lexer.lex(text_input4)
+tokens = lexer.lex(text_input5)
 
 pg = Parser()
 pg.parse()

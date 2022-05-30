@@ -52,3 +52,43 @@ class Helpers:
         elif myVar in myFunctions[globalFunc][1]:
             return globalFunc
         return -1
+    
+    def getOperationNumber(self, quads):
+        for row in quads:
+            op = row[0]
+            if op == "ADD":
+                row[0] = 1
+            elif op == "SUBSTR":
+                row[0] = 2
+            elif op == "MULT":
+                row[0] = 3
+            elif op == "DIVIS":
+                row[0] = 4
+            elif op == "EQUAL":
+                row[0] = 5
+            elif op == "MORE_THAN":
+                row[0] = 6
+            elif op == "LESS_THAN":
+                row[0] = 7
+            elif op == "IS_EQUAL":
+                row[0] = 8
+            elif op == "NOT_EQUAL":
+                row[0] = 9
+            elif op == "PRINT":
+                row[0] = 10
+            elif op == "INPUT":
+                row[0] = 11
+            elif op == "GOTO":
+                row[0] = 12
+            elif op == "GOTOF":
+                row[0] = 13
+            elif op == "GOSUB":
+                row[0] = 14
+            elif op == "ERA":
+                row[0] = 15
+            elif op == "PARAM":
+                row[0] = 16
+            elif op == "END":
+                row[0] = 17
+            elif op == "ENDFUNC":
+                row[0] = 18

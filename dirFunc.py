@@ -68,6 +68,9 @@ class DirFunc:
             self.misFunciones[currFunc]["numTempsFl"] += 1
         elif currType == "BOOL":
             self.misFunciones[currFunc]["numTempsBl"] += 1
+    
+    def exportFuncs(self):
+        print("YA QUIERO EXPORTAR MIS FUNCIONES")
 
     def pr(self):
         for key in self.misFunciones:

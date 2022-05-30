@@ -1,3 +1,4 @@
+import numpy as np
 from helpers import Helpers
 
 class MemVirtual:
@@ -67,5 +68,10 @@ class MemVirtual:
         else:
             return index + 4750
     
-    def resetLocalVars(self):
-        self.myMemory[2] = [2000, 2250, 2500, 2750]
+    def resetVars(self):
+        self.myMemory[1] = [2000, 2250, 2500, 2750]
+        self.myMemory[2] = [3000, 3250, 3500, 3750]
+    
+    def exportCtes(self):
+        myCtes = np.array(self.myConstants, dtype=object)
+        np.savetxt('ExportedFiles/exportedCtes.csv', myCtes, delimiter=",", fmt="%s")
