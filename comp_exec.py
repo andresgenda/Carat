@@ -33,11 +33,12 @@ var int miVar1, miVar2, miVar3;
 var float miFloat;
 
 main () {
+    print("Ingrese un numero: ");
     input(miFloat);
     if(miFloat > 5){
-        print("Var1 mayor que 1");
+        print("Var1 mayor que 5");
     }else{
-        print("Var1 menor que 1");
+        print("Var1 menor que 5");
     }
     miVar1 = 1;
     while(miVar1 < 5) do {
@@ -49,7 +50,7 @@ main () {
 
 def compExec():
     lexer = Lexer().get_lexer()
-    tokens = lexer.lex(text_input3)
+    tokens = lexer.lex(text_input4)
     pg = Parser()
     pg.parse()
     parser = pg.get_parser()

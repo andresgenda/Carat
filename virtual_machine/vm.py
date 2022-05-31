@@ -1,10 +1,14 @@
 import csv
+from stack import Stack
+from pathlib import Path
 
 class vm:
     
     def __init__(self):
         self.impQuads = []
         self.impCtes = []
+        self.impFuncs = {}
+        self.activeMems = Stack()
         self.mem = {}
     
     def execute(self):
@@ -14,6 +18,7 @@ class vm:
     def importFiles(self):
         self.importQuads()
         self.importCtes()
+        self.importFuncs()
     
     def importQuads(self):
         with open("ExportedFiles/exportedQuads.csv") as file:
@@ -36,20 +41,38 @@ class vm:
             for row in file:
                 cont = 0
                 while(cont < len(row)):
-                    row[cont] = row[cont].replace("[","")
-                    row[cont] = row[cont].replace("]","")
-                    row[cont] = row[cont].replace(" ","")
-                    row[cont] = row[cont].replace("'", "")
-                    if rowCont == 0:
-                        if row[cont] != '':
-                            row[cont] = int(row[cont])
-                    elif rowCont == 1:
-                        if row[cont] != '':
-                            row[cont] = float(row[cont])
+                    if rowCont != 2:
+                        row[cont] = row[cont].replace("[","")
+                        row[cont] = row[cont].replace("]","")
+                        row[cont] = row[cont].replace(" ","")
+                        row[cont] = row[cont].replace("'", "")
+                        if rowCont == 0:
+                            if row[cont] != '':
+                                row[cont] = int(row[cont])
+                        elif rowCont == 1:
+                            if row[cont] != '':
+                                row[cont] = float(row[cont])
+                    else:
+                        row[cont] = row[cont].replace("[","")
+                        row[cont] = row[cont].replace("]","")
+                        row[cont] = row[cont].replace("'", "")
                     cont += 1
                 rowCont += 1
                 self.impCtes.append(row)
             #print(self.impCtes)
+    
+    def importFuncs(self):
+        with open("ExportedFiles/exportedFuncs.csv") as file:
+            file = csv.reader(file)
+            for row in file:
+                cont = 1
+                while(cont < len(row)):
+                    if row[cont].isdigit():
+                        row[cont] = int(row[cont])
+                    elif isinstance(row[cont], str):
+                        row[cont] = row[cont].replace("\'", "")
+                    cont += 1
+                self.impFuncs[row[0]] = row[1:]
     
     def getDirValue(self, dir):
         if dir < 2000:

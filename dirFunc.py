@@ -1,3 +1,5 @@
+import numpy as np
+
 class DirFunc:
 
     def __init__(self):
@@ -11,6 +13,8 @@ class DirFunc:
             "numParamsFl" : 0,
             "numLocalsInt" : 0,
             "numLocalsFl" : 0,
+            "numVarsInt" : 0,
+            "numVarsFl" : 0,
             "numTempsInt" : 0,
             "numTempsFl" : 0,
             "numTempsBl" : 0,
@@ -70,20 +74,42 @@ class DirFunc:
             self.misFunciones[currFunc]["numTempsBl"] += 1
     
     def exportFuncs(self):
-        print("YA QUIERO EXPORTAR MIS FUNCIONES")
+        myFuncs = np.array(self.dictToArray())
+        np.savetxt('ExportedFiles/exportedFuncs.csv', myFuncs, delimiter=",", fmt="%s")
+    
+    def dictToArray(self):
+        funcsArray = []
+        for key in self.misFunciones:
+            currFunc = []
+            currFunc.append(key)
+            funcInfo = self.misFunciones[key]
+            currFunc.append(funcInfo["tipo"])
+            currFunc.append(funcInfo["numVarsInt"])
+            currFunc.append(funcInfo["numVarsFl"])
+            currFunc.append(funcInfo["numTempsInt"])
+            currFunc.append(funcInfo["numTempsFl"])
+            currFunc.append(funcInfo["numTempsBl"])
+            funcsArray.append(currFunc)
+        return funcsArray
     
     def deleteKey(self, currFunc, key):
         self.misFunciones[currFunc].pop(key)
+    
+    def setVarsTotal(self, currFunc):
+        locVarsInt = self.misFunciones[currFunc]["numLocalsInt"]
+        paramInts = self.misFunciones[currFunc]["numParamsInt"]
+        self.misFunciones[currFunc]["numVarsInt"] = locVarsInt + paramInts
+        locVarsFl = self.misFunciones[currFunc]["numLocalsFl"]
+        paramFl = self.misFunciones[currFunc]["numParamsFl"]
+        self.misFunciones[currFunc]["numVarsFl"] = locVarsFl + paramFl
 
     def pr(self):
         for key in self.misFunciones:
             print("----------- FUNCION", key, "-----------")
             print("Tipo:", self.misFunciones[key]["tipo"])
             print("Direccion de inicio:", self.misFunciones[key]["startDir"])
-            print("Numero de parametros enteras:", self.misFunciones[key]["numParamsInt"])
-            print("Numero de parametros flotantes:", self.misFunciones[key]["numParamsFl"])
-            print("Numero de variables locales enteras:", self.misFunciones[key]["numLocalsInt"])
-            print("Numero de variables locales flotantes:", self.misFunciones[key]["numLocalsFl"])
+            print("Numero de variables locales enteras:", self.misFunciones[key]["numVarsInt"])
+            print("Numero de variables locales flotantes:", self.misFunciones[key]["numVarsFl"])
             print("Numero de temporales enteras:", self.misFunciones[key]["numTempsInt"])
             print("Numero de temporales flotantes:", self.misFunciones[key]["numTempsFl"])
             print("Numero de temporales booleanas:", self.misFunciones[key]["numTempsBl"])

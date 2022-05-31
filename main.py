@@ -121,7 +121,7 @@ main () {
 """
 
 lexer = Lexer().get_lexer()
-tokens = lexer.lex(text_input5)
+tokens = lexer.lex(text_input4)
 
 pg = Parser()
 pg.parse()
