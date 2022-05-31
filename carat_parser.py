@@ -48,11 +48,13 @@ class Parser():
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa4')
         def programa(p):
+            self.newDirFunc.deleteKey(self.currFunc, "vars")
+            self.newDirFunc.deleteKey(self.currFunc, "params")
             newQuad = ["END", "", "", ""]
             self.misQuads.append(newQuad)
             #self.quads.printQuads(self.misQuads)
             self.help.getOperationNumber(self.misQuads)
-            #self.newDirFunc.pr()
+            self.newDirFunc.pr()
             quadsExport = np.array(self.misQuads)
             np.savetxt('ExportedFiles/exportedQuads.csv', quadsExport, delimiter=',', fmt="%s")
             self.memVirt.exportCtes()
@@ -160,10 +162,12 @@ class Parser():
         def funcion(p):
             #Al terminar la funcion actual, la funcion actual vuelve a ser la global
             self.newDirFunc.setNumVars(self.currFunc)
-            self.currFunc = self.globalFunc
+            self.newDirFunc.deleteKey(self.currFunc, "vars")
+            self.newDirFunc.deleteKey(self.currFunc, "params")
             self.memVirt.resetVars()
             newQuad = ["ENDFUNC", "", "", ""]
             self.misQuads.append(newQuad)
+            self.currFunc = self.globalFunc
             return p
 
         @self.pg.production('f_void : bpVoid init OPEN_CURLY f_void2')

@@ -71,6 +71,9 @@ class DirFunc:
     
     def exportFuncs(self):
         print("YA QUIERO EXPORTAR MIS FUNCIONES")
+    
+    def deleteKey(self, currFunc, key):
+        self.misFunciones[currFunc].pop(key)
 
     def pr(self):
         for key in self.misFunciones:
@@ -84,5 +87,5 @@ class DirFunc:
             print("Numero de temporales enteras:", self.misFunciones[key]["numTempsInt"])
             print("Numero de temporales flotantes:", self.misFunciones[key]["numTempsFl"])
             print("Numero de temporales booleanas:", self.misFunciones[key]["numTempsBl"])
-            print("Parametros:", self.misFunciones[key]["params"])
-            print("Variables:", self.misFunciones[key]["vars"])
+            #print("Parametros:", self.misFunciones[key]["params"])
+            #print("Variables:", self.misFunciones[key]["vars"])
