@@ -33,9 +33,17 @@ var int miVar1, miVar2, miVar3;
 var float miFloat;
 
 main () {
-    print(2 * (3 + 2));
-    miVar1 = 1 + 1;
-    print(miVar1, 4*4);
+    input(miFloat);
+    if(miFloat > 5){
+        print("Var1 mayor que 1");
+    }else{
+        print("Var1 menor que 1");
+    }
+    miVar1 = 1;
+    while(miVar1 < 5) do {
+        print(miVar1);
+        miVar1 = miVar1 + 1;
+    }
 }
 """
 

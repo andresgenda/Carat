@@ -41,9 +41,11 @@ class vm:
                     row[cont] = row[cont].replace(" ","")
                     row[cont] = row[cont].replace("'", "")
                     if rowCont == 0:
-                        row[cont] = int(row[cont])
-                    #elif rowCont == 1:
-                        #row[cont] = float(row[cont])
+                        if row[cont] != '':
+                            row[cont] = int(row[cont])
+                    elif rowCont == 1:
+                        if row[cont] != '':
+                            row[cont] = float(row[cont])
                     cont += 1
                 rowCont += 1
                 self.impCtes.append(row)
@@ -85,53 +87,69 @@ class vm:
             op1 = quadToExec[1]
             op2 = quadToExec[2]
             res = quadToExec[3]
-            #CURRENT OPERATION -> ADD
-            if currOp == 1:
+            #ARITMETHIC OPERATIONS ------------------------------------------------------------
+            if currOp < 5:
                 op1Val = self.getDirValue(op1)
                 op2Val = self.getDirValue(op2)
-                self.assignValToDir(res, op1Val + op2Val)
-            #CURRENT OPERATION -> SUBSTRACT
-            elif currOp == 2:
-                op1Val = self.getDirValue(op1)
-                op2Val = self.getDirValue(op2)
-                self.assignValToDir(res, op1Val - op2Val)
-            #CURRENT OPERATION -> MULTIPLICATION
-            elif currOp == 3:
-                op1Val = self.getDirValue(op1)
-                op2Val = self.getDirValue(op2)
-                self.assignValToDir(res, op1Val * op2Val)
-            #CURRENT OPERATION -> DIVISION
-            elif currOp == 4:
-                print("ARREGLAR DIVIS")
+                #CURRENT OPERATION -> ADD
+                if currOp == 1:
+                    self.assignValToDir(res, op1Val + op2Val)
+                #CURRENT OPERATION -> SUBSTRACT
+                elif currOp == 2:
+                    self.assignValToDir(res, op1Val - op2Val)
+                #CURRENT OPERATION -> MULTIPLICATION
+                elif currOp == 3:
+                    self.assignValToDir(res, op1Val * op2Val)
+                #CURRENT OPERATION -> DIVISION
+                elif currOp == 4:
+                    op1type = op1 % 1000
+                    op2type = op2 % 1000
+                    if op1type >= 250 or op2type >= 250:
+                        self.assignValToDir(res, op1Val / op2Val)
+                    else:
+                        self.assignValToDir(res, op1Val // op2Val)
+            #ARITMETHIC OPERATIONS END --------------------------------------------------------
             #CURRENT OPERATION -> ASSIGN
             elif currOp == 5:
                 op1Val = self.getDirValue(op1)
                 self.assignValToDir(res, op1Val)
-            #CURRENT OPERATION -> MORE THAN '>'
-            elif currOp == 6:
-                print("MAYOR QUE")
-            #CURRENT OPERATION -> LESS THAN '<'
-            elif currOp == 7:
-                print("MENOR QUE")
-            #CURRENT OPERATION -> IS EQUAL TO '=='
-            elif currOp == 8:
-                print("ES IGUAL")
-            #CURRENT OPERATION -> IS DIFFERENT THAN '!='
-            elif currOp == 9:
-                print("DIFERENTE")
+            #COMPARISON OPERATIONS ------------------------------------------------------------
+            elif currOp < 10:
+                op1Val = self.getDirValue(op1)
+                op2Val = self.getDirValue(op2)
+                #CURRENT OPERATION -> MORE THAN '>'
+                if currOp == 6:
+                    self.assignValToDir(res, op1Val > op2Val)
+                #CURRENT OPERATION -> LESS THAN '<'
+                elif currOp == 7:
+                    self.assignValToDir(res, op1Val < op2Val)
+                #CURRENT OPERATION -> IS EQUAL TO '=='
+                elif currOp == 8:
+                    self.assignValToDir(res, op1Val == op2Val)
+                #CURRENT OPERATION -> IS DIFFERENT THAN '!='
+                elif currOp == 9:
+                    self.assignValToDir(res, op1Val != op2Val)
+            #COMPARISON OPERATIONS END --------------------------------------------------------
             #CURRENT OPERATION -> PRINT
             elif currOp == 10:
                 resValue = self.getDirValue(res)
                 print(resValue)
             #CURRENT OPERATION -> INPUT
             elif currOp == 11:
-                print("INPUT")
+                resType = res % 1000
+                if resType < 250:
+                    resVal = int(input())
+                else:
+                    resVal = float(input())
+                self.assignValToDir(res, resVal)
             #CURRENT OPERATION -> GOTO
             elif currOp == 12:
-                print("GOTO")
+                cont = res - 2
             #CURRENT OPERATION -> GOTO (FALSE)
             elif currOp == 13:
-                print("GOTOF")
+                op1Val = self.getDirValue(op1)
+                if(op1Val == False):
+                    cont = res - 2
             #CURRENT OPERATION -> GOSUB (Go to the start of a function)
             elif currOp == 14:
                 print("GOSUB")

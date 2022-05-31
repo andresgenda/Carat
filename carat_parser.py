@@ -50,9 +50,9 @@ class Parser():
         def programa(p):
             newQuad = ["END", "", "", ""]
             self.misQuads.append(newQuad)
-            self.quads.printQuads(self.misQuads)
+            #self.quads.printQuads(self.misQuads)
             self.help.getOperationNumber(self.misQuads)
-            self.newDirFunc.pr()
+            #self.newDirFunc.pr()
             quadsExport = np.array(self.misQuads)
             np.savetxt('ExportedFiles/exportedQuads.csv', quadsExport, delimiter=',', fmt="%s")
             self.memVirt.exportCtes()
