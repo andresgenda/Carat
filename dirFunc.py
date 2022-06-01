@@ -97,11 +97,11 @@ class DirFunc:
     
     def setVarsTotal(self, currFunc):
         locVarsInt = self.misFunciones[currFunc]["numLocalsInt"]
-        paramInts = self.misFunciones[currFunc]["numParamsInt"]
-        self.misFunciones[currFunc]["numVarsInt"] = locVarsInt + paramInts
+        #paramInts = self.misFunciones[currFunc]["numParamsInt"]
+        self.misFunciones[currFunc]["numVarsInt"] = locVarsInt #+ paramInts
         locVarsFl = self.misFunciones[currFunc]["numLocalsFl"]
-        paramFl = self.misFunciones[currFunc]["numParamsFl"]
-        self.misFunciones[currFunc]["numVarsFl"] = locVarsFl + paramFl
+        #paramFl = self.misFunciones[currFunc]["numParamsFl"]
+        self.misFunciones[currFunc]["numVarsFl"] = locVarsFl #+ paramFl
 
     def pr(self):
         for key in self.misFunciones:

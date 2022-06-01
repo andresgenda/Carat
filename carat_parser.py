@@ -182,7 +182,7 @@ class Parser():
 
 
         @self.pg.production('f_void2 : vars addVars f_void3')
-        @self.pg.production('f_void2 : f_void3')
+        @self.pg.production('f_void2 : addVars f_void3')
         def f_void2(p):
             return p
         
@@ -195,12 +195,25 @@ class Parser():
             return p
         
         @self.pg.production('f_ret2 : vars addVars f_ret3')
-        @self.pg.production('f_ret2 : f_ret3')
+        @self.pg.production('f_ret2 : addVars f_ret3')
         def f_ret2(p):
             return p
         
-        @self.pg.production('f_ret3 : bloque RETURN OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON CLOSE_CURLY')
+        @self.pg.production('f_ret3 : bloque RETURN OPEN_PARENTH exp CLOSE_PARENTH doReturn SEMI_COLON CLOSE_CURLY')
+        @self.pg.production('f_ret3 : RETURN OPEN_PARENTH exp CLOSE_PARENTH doReturn SEMI_COLON CLOSE_CURLY')
         def f_ret3(p):
+            return p
+        
+        @self.pg.production('doReturn : ')
+        def doReturn(p):
+            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
+            retOp = self.stackOperandos.pop()
+            tipoActual = self.stackTipos.pop()
+            funcType = self.newDirFunc.misFunciones[self.currFunc]["tipo"]
+            if tipoActual != funcType:
+                raise ValueError("Return - Function Type-mismatch")
+            newQuad = ["RETURN", "", "", retOp]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init2')
@@ -238,7 +251,6 @@ class Parser():
             self.currType = listaPlana[0].gettokentype()
             if listaPlana[1].value in self.currVarT:
                 raise ValueError("Declaracion multiple de variables")
-            #PUES AQUI PONER LA ACTUAL DIR
             if self.currFunc == self.globalFunc:
                 currDir = self.memVirt.getNextDir(self.currType, 0)
             else:
@@ -558,7 +570,9 @@ class Parser():
             self.stackTipos.pop()
             result = self.memVirt.getNextDir("INT", 2)
             self.newDirFunc.setNumTemps(self.currFunc, "INT")
-            newQuad = ["ADD", vcontrol, 1, result]
+            self.memVirt.assignCte("INT", '1')
+            addOne = self.memVirt.getCteDir('1', "INT")
+            newQuad = ["ADD", vcontrol, addOne, result]
             self.misQuads.append(newQuad)
             newQuad = ["EQUAL", result, "", vcontrol]
             self.misQuads.append(newQuad)
@@ -589,7 +603,7 @@ class Parser():
                     self.stackOperandos.push(dirCte)
                     self.stackTipos.push(curr_type)
                 else:
-                    raise ValueError("Type-mismathc")
+                    raise ValueError("Type-mismatch")
             else:
                 if curr_id in self.newDirFunc.getVars(self.globalFunc):
                     if self.newDirFunc.getIDType(self.globalFunc, curr_id) == "INT":
@@ -599,7 +613,7 @@ class Parser():
                         self.stackOperandos.push(dirCte)
                         self.stackTipos.push(curr_type)
                     else:
-                        raise ValueError("Type-mismathc")
+                        raise ValueError("Type-mismatch")
                 else:
                     raise ValueError("Variable de FOR no declarada")
             return p
@@ -666,6 +680,7 @@ class Parser():
             self.accessFunc = curr_id
             newQuad = ["ERA", "", "", curr_id]
             self.misQuads.append(newQuad)
+            self.paramCounter = 0
             return p
         
         @self.pg.production('llam_func2 : exp checkParam llam_func3')
@@ -685,7 +700,15 @@ class Parser():
             curr_type = self.stackTipos.pop()
             if curr_type != self.newDirFunc.getParam(self.accessFunc, self.paramCounter):
                 raise ValueError("Type-mismatch in function")
-            newQuad = ["PARAM", arg, "", "Param"]
+            if curr_type == "INT":
+                offset = 0
+            elif curr_type == "FLOAT":
+                offset = 250
+            elif curr_type == "STRING":
+                offset = 500
+            elif curr_type == "BOOL":
+                offset = 750
+            newQuad = ["PARAM", arg, "", self.paramCounter + offset]
             self.misQuads.append(newQuad)
             self.paramCounter += 1
             return p

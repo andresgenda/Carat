@@ -92,13 +92,8 @@ program Carat;
 var int miVar1, miVar2, miVar3;
 var float miFloat;
 
-void func Pinta(int y, int z) {
-    var int x;
-    x = 1.5 + 1 * (2 - 1);
-    y = 1 + 8;
-    for miVar1 = 1 to 5 do {
-        print("holis");
-    }
+int func Pinta(int y, int z) {
+    return(y);
 }
 
 main () {

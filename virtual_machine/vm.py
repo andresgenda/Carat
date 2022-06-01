@@ -1,6 +1,7 @@
 import csv
 from stack import Stack
 from pathlib import Path
+from virtual_machine.memVirtM import MemVirtM
 
 class vm:
     
@@ -9,10 +10,14 @@ class vm:
         self.impCtes = []
         self.impFuncs = {}
         self.activeMems = Stack()
-        self.mem = {}
+        self.globalMem = ""
+        self.currMem = ""
+        self.newMem = ""
+        self.stackJumps = Stack()
     
     def execute(self):
         self.importFiles()
+        self.startGlobalMem()
         self.execQuads()
         
     def importFiles(self):
@@ -74,15 +79,16 @@ class vm:
                     cont += 1
                 self.impFuncs[row[0]] = row[1:]
     
+    def startGlobalMem(self):
+        self.globalMem = MemVirtM(self.impFuncs["Carat"])
+        self.currMem = self.globalMem
+        self.activeMems.push(self.globalMem)
+    
     def getDirValue(self, dir):
         if dir < 2000:
-            #print("AQUI BUSCARE EN GLOBALES")
-            return self.mem[dir]
-        elif dir < 3000:
-            print("AQUI BUSCARE EN LOCALES")
+            return self.globalMem.getVal(dir)
         elif dir < 4000:
-            #print("AQUI BUSCARE EN TEMPS")
-            return self.mem[dir]
+            return self.currMem.getVal(dir)
         elif dir < 5000:
             return self.getCteValue(dir)
         
@@ -99,7 +105,10 @@ class vm:
             return self.impCtes[3][baseType-750]
     
     def assignValToDir(self, dir, val):
-        self.mem[dir] = val
+        if dir < 2000:
+            self.globalMem.assignVal(dir, val)
+        else:
+            self.currMem.assignVal(dir, val)
     
     def execQuads(self):
         gotoMain = self.impQuads[0][3]
@@ -175,18 +184,25 @@ class vm:
                     cont = res - 2
             #CURRENT OPERATION -> GOSUB (Go to the start of a function)
             elif currOp == 14:
-                print("GOSUB")
+                self.stackJumps.push(cont)
+                self.currMem = self.newMem
+                self.activeMems.push(self.currMem)
+                cont = res - 2
             #CURRENT OPERATION -> ERA (Start the new memory for the function)
             elif currOp == 15:
-                print("ERA")
+                funcName = res
+                self.newMem = MemVirtM(self.impFuncs[funcName])
             #CURRENT OPERATION -> PARAM (Send over the parameters)
             elif currOp == 16:
-                print("PARAM")
+                valueToPass = self.getDirValue(op1)
+                self.newMem.assignVal(2000 + res, valueToPass)
             #CURRENT OPERATION -> END (The program ends)
             elif currOp == 17:
                 break
             #CURRENT OPERATION -> ENDFUNC (The current function ends)
             elif currOp == 18:
-                print("ENDFUNC")
+                self.activeMems.pop()
+                self.currMem = self.activeMems.top()
+                cont = self.stackJumps.pop()
             
             cont += 1
