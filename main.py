@@ -100,7 +100,7 @@ main () {
     input(miVar3);
     print("Main");
     miVar2 = 1 + 1;
-    Pinta(2 + 2, 4);
+    miVar3 = (Pinta(2 + 2, 4);)
 }
 """
 
@@ -112,6 +112,44 @@ var float miFloat;
 
 main () {
     miVar2 = miVar1 * 2;
+}
+"""
+
+text_input7 = """
+program Carat; 
+
+var int miVar1, miVar2, miVar3;
+var float miFloat;
+
+int func fib(int x) {
+    if(x < 2){
+        return(x);
+    }
+    x = x - 1;
+    return(fib(x););
+}
+
+main () {
+    miVar3 = fib(9);
+    print(miVar3);
+}
+"""
+text_input8 = """
+program Carat; 
+
+var int miVar1, miVar2, miVar3;
+var float miFloat;
+
+int func fib(int x) {
+    if(x < 2){
+        return(x);
+    }
+    return((fib(x-1);) - (fib(x-2);));
+}
+
+main () {
+    miVar3 = (fib(9);)
+    print(miVar3);
 }
 """
 

@@ -51,7 +51,7 @@ class Parser():
             self.newDirFunc.deleteKey(self.currFunc, "vars")
             newQuad = ["END", "", "", ""]
             self.misQuads.append(newQuad)
-            #self.quads.printQuads(self.misQuads)
+            self.quads.printQuads(self.misQuads)
             self.help.getOperationNumber(self.misQuads)
             self.newDirFunc.pr()
             quadsExport = np.array(self.misQuads)
@@ -199,20 +199,22 @@ class Parser():
         def f_ret2(p):
             return p
         
-        @self.pg.production('f_ret3 : bloque RETURN OPEN_PARENTH exp CLOSE_PARENTH doReturn SEMI_COLON CLOSE_CURLY')
-        @self.pg.production('f_ret3 : RETURN OPEN_PARENTH exp CLOSE_PARENTH doReturn SEMI_COLON CLOSE_CURLY')
+        @self.pg.production('f_ret3 : bloque CLOSE_CURLY')
+        @self.pg.production('f_ret3 : CLOSE_CURLY')
         def f_ret3(p):
             return p
         
         @self.pg.production('doReturn : ')
         def doReturn(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
-            retOp = self.stackOperandos.pop()
-            tipoActual = self.stackTipos.pop()
+            retOp = self.stackOperandos.top()
+            tipoActual = self.stackTipos.top()
             funcType = self.newDirFunc.misFunciones[self.currFunc]["tipo"]
+            print(funcType, retOp, tipoActual)
             if tipoActual != funcType:
                 raise ValueError("Return - Function Type-mismatch")
-            newQuad = ["RETURN", "", "", retOp]
+            dirFunc = self.newDirFunc.getVarMem(self.globalFunc, self.currFunc)
+            newQuad = ["RETURN", dirFunc, "", retOp]
             self.misQuads.append(newQuad)
             return p
         
@@ -234,6 +236,10 @@ class Parser():
             self.currFunc = p[0].value
             #NUEVA TABLA DE FUNCIONES
             self.newDirFunc.addFunc(self.currFunc, self.currType)
+            if self.currType != "VOID":
+                currDir = self.memVirt.getNextDir(self.currType, 0)
+                infoToAdd = [self.currType, currDir]
+                self.newDirFunc.misFunciones[self.globalFunc]["vars"][self.currFunc] = infoToAdd
             return p
         
         @self.pg.production('init2 : addParam COMMA init2')
@@ -272,7 +278,13 @@ class Parser():
         @self.pg.production('estatuto : ciclo_sc')
         @self.pg.production('estatuto : llam_func')
         @self.pg.production('estatuto : llam_esp')
+        @self.pg.production('estatuto : ret')
         def estatuto(p):
+            return p
+        
+        @self.pg.production('ret : RETURN OPEN_PARENTH expresion CLOSE_PARENTH doReturn SEMI_COLON')
+        @self.pg.production('ret : RETURN OPEN_PARENTH llam_func CLOSE_PARENTH doReturn SEMI_COLON')
+        def ret(p):
             return p
         
         @self.pg.production('asignacion : asigHelp asignacion2')
@@ -294,9 +306,9 @@ class Parser():
             self.stackOperaciones.push(p[1].gettokentype())
             return p
         
+        @self.pg.production('asignacion2 : llam_func')
         @self.pg.production('asignacion2 : asig_arr SEMI_COLON')
         @self.pg.production('asignacion2 : expresion SEMI_COLON')
-        @self.pg.production('asignacion2 : llam_func')
         def asignacion2(p):
             return p
         
@@ -427,8 +439,8 @@ class Parser():
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
-        @self.pg.production('factor3 : var_cte')
         @self.pg.production('factor3 : llam_func')
+        @self.pg.production('factor3 : var_cte')
         def factor3(p):
             return p
         
@@ -662,13 +674,23 @@ class Parser():
                     self.stackJumps.push(currJump)
             return p
         
-        @self.pg.production('llam_func : verifyFuncID OPEN_PARENTH llam_func2')
+        @self.pg.production('llam_func : OPEN_PARENTH verifyFuncID OPEN_PARENTH llam_func2')
         def llam_func(p):
             if self.newDirFunc.getParam(self.accessFunc, self.paramCounter) != -1:
                 raise ValueError("Faltan variables por declarar")
             startAddress = self.newDirFunc.getStart(self.accessFunc)
             newQuad = ["GOSUB", self.accessFunc, "", startAddress]
             self.misQuads.append(newQuad)
+            accessFuncType = self.newDirFunc.getFuncType(self.accessFunc)
+            if accessFuncType != "VOID":
+                dirFunc = self.newDirFunc.getVarMem(self.globalFunc, self.accessFunc)
+                result = self.memVirt.getNextDir(accessFuncType, 2)
+                self.newDirFunc.setNumTemps(self.currFunc, accessFuncType)
+                newQuad = ["EQUAL", dirFunc, "", result]
+                self.misQuads.append(newQuad)
+                self.stackOperandos.push(result)
+                currType = self.help.getTypeDir(dirFunc)
+                self.stackTipos.push(currType)
             self.accessFunc = ""
             return p
         
@@ -681,21 +703,28 @@ class Parser():
             newQuad = ["ERA", "", "", curr_id]
             self.misQuads.append(newQuad)
             self.paramCounter = 0
+            self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
         @self.pg.production('llam_func2 : exp checkParam llam_func3')
-        @self.pg.production('llam_func2 : CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('llam_func2 : CLOSE_PARENTH SEMI_COLON CLOSE_PARENTH')
         def llam_func2(p):
             return p
         
-        @self.pg.production('llam_func3 : COMMA exp checkParam llam_func3')
-        @self.pg.production('llam_func3 : CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('llam_func3 : COMMA addFkBtm exp checkParam llam_func3')
+        @self.pg.production('llam_func3 : CLOSE_PARENTH SEMI_COLON CLOSE_PARENTH')
         def llam_func3(p):
+            return p
+        
+        @self.pg.production('addFkBtm : ')
+        def addFkBtm(p):
+            self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
         @self.pg.production('checkParam : ')
         def checkParam(p):
-            self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
+            #AQUI HACER UNA FUNCION ESPECIAL PARA ACABAR Q NO SEA EN EQUAL
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             arg = self.stackOperandos.pop()
             curr_type = self.stackTipos.pop()
             if curr_type != self.newDirFunc.getParam(self.accessFunc, self.paramCounter):

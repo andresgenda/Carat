@@ -204,5 +204,12 @@ class vm:
                 self.activeMems.pop()
                 self.currMem = self.activeMems.top()
                 cont = self.stackJumps.pop()
+            #CURRENT OPERATION -> RETURN
+            elif currOp == 19:
+                resVal = self.getDirValue(res)
+                self.assignValToDir(op1, resVal)
+                self.activeMems.pop()
+                self.currMem = self.activeMems.top()
+                cont = self.stackJumps.pop()
             
             cont += 1

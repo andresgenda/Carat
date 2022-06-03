@@ -27,6 +27,11 @@ class Quadruples:
         quadToFill = miStackJmps.pop()
         misNuevosQuads[quadToFill][3] = myGoto
     
+    def emptyExpNoEqual(self, miStackOpernds, miStackTps, miStackOps, misNuevosQuads, memVir, dirFuncs, currFunc):
+        while miStackOps.top() != "EQUAL" and miStackOps.top() != -1:
+            checkOp = miStackOps.pop()
+            self.executeQuadGenCopy(checkOp, miStackOpernds, miStackTps, misNuevosQuads, memVir, dirFuncs, currFunc)
+    
     def emptyParenth(self, miStackOpernds, miStackTps, miStackOps, misNuevosQuads, memVir, dirFuncs, currFunc):
         while miStackOps.top() != "OPEN_PARENTH":
             checkOp = miStackOps.pop()

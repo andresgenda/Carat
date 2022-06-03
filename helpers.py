@@ -49,9 +49,25 @@ class Helpers:
     def getVarFunction(self, myFunctions, myVar, currFunc, globalFunc):
         if myVar in myFunctions[currFunc]["vars"]:
             return currFunc
-        elif myVar in myFunctions[globalFunc][1]:
+        elif myVar in myFunctions[globalFunc]["vars"]:
             return globalFunc
         return -1
+    
+    def getTypeDir(self, currDir):
+        if currDir < 2000:
+            return self.getOffset(currDir - 1000)
+        elif currDir < 3000:
+            return self.getOffset(currDir - 2000)
+        elif currDir < 4000:
+            return self.getOffset(currDir - 3000)
+        elif currDir < 5000:
+            return self.getOffset(currDir - 4000)
+    
+    def getOffset(self, off):
+        if off < 250:
+            return "INT"
+        elif off < 500:
+            return "FLOAT"
     
     def getOperationNumber(self, quads):
         for row in quads:
@@ -92,3 +108,5 @@ class Helpers:
                 row[0] = 17
             elif op == "ENDFUNC":
                 row[0] = 18
+            elif op == "RETURN":
+                row[0] = 19

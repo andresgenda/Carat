@@ -11,13 +11,31 @@ var float miFloat;
 
 void func Pinta(int y, int x) {
     if(y > 4){
-        Pinta(y - x, x + 1);
+        (Pinta(y - x, x + 1);)
         print(y);
     }
 }
 
 main () {
-    Pinta(2 + 5, 2);
+    (Pinta(2 + 5, 2);)
+}
+"""
+
+text_input8 = """
+program Carat; 
+
+var int miVar1, miVar2, miVar3;
+var float miFloat;
+
+int func fib(int x) {
+    if(x < 2){
+        return(x);
+    }
+    return((fib(x-1);) + (fib(x-2);));
+}
+
+main () {
+    print((fib(9);));
 }
 """
 
@@ -57,7 +75,7 @@ main () {
 
 def compExec():
     lexer = Lexer().get_lexer()
-    tokens = lexer.lex(text_input4)
+    tokens = lexer.lex(text_input5)
     pg = Parser()
     pg.parse()
     parser = pg.get_parser()

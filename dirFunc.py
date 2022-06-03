@@ -23,7 +23,7 @@ class DirFunc:
         }
     
     def getFuncType(self, currFunc):
-        return self.misFunciones[currFunc][0]
+        return self.misFunciones[currFunc]["tipo"]
     
     def addVar(self, currFunc, currVars):
         self.misFunciones[currFunc]["vars"] = currVars
