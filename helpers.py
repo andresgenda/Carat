@@ -110,3 +110,17 @@ class Helpers:
                 row[0] = 18
             elif op == "RETURN":
                 row[0] = 19
+            elif op == "LINEUP":
+                row[0] = 20
+            elif op == "LINEDOWN":
+                row[0] = 21
+            elif op == "RIGHT":
+                row[0] = 22
+            elif op == "LEFT":
+                row[0] = 23
+            elif op == "CLEAR":
+                row[0] = 24
+            elif op == "PINTAR":
+                row[0] = 25
+            elif op == "NOPINTAR":
+                row[0] = 26

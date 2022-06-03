@@ -754,6 +754,30 @@ class Parser():
         def llam_esp(p):
             return p
         
+        @self.pg.production('commaFkBtmRt : COMMA')
+        def commaFkBtmRt(p):
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["RIGHT", "", "", result]
+            self.misQuads.append(newQuad)
+            self.stackOperaciones.push('OPEN_PARENTH')
+            return p
+        
+        @self.pg.production('commaFkBtmLft : COMMA')
+        def commaFkBtmLft(p):
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["LEFT", "", "", result]
+            self.misQuads.append(newQuad)
+            self.stackOperaciones.push('OPEN_PARENTH')
+            return p
+        
         @self.pg.production('linea : arriba')
         @self.pg.production('linea : abajo')
         @self.pg.production('linea : derecha')
@@ -761,20 +785,44 @@ class Parser():
         def linea(p):
             return p
         
-        @self.pg.production('arriba : LINEUP OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('arriba : LINEUP op_parenth exp cl_parenth SEMI_COLON')
         def arriba(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["LINEUP", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('abajo : LINEDOWN OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('abajo : LINEDOWN op_parenth exp cl_parenth SEMI_COLON')
         def abajo(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["LINEDOWN", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('derecha : LINERT OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('derecha : LINERT op_parenth exp commaFkBtmRt exp cl_parenth SEMI_COLON')
         def derecha(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)")
+            newQuad = ["LINEUP", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('izq : LINELF OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('izq : LINELF op_parenth exp commaFkBtmLft exp cl_parenth SEMI_COLON')
         def izq(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)")
+            newQuad = ["LINEUP", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.production('punto : POINT OPEN_PARENTH exp COMMA exp CLOSE_PARENTH SEMI_COLON')
@@ -791,10 +839,14 @@ class Parser():
         
         @self.pg.production('pintar : PENDOWN OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def pintar(p):
+            newQuad = ["PINTAR", "", "", ""]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.production('no_pintar : PENUP OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def no_pintar(p):
+            newQuad = ["NOPINTAR", "", "", ""]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.production('col : PENCOLOR OPEN_PARENTH exp COMMA exp COMMA exp CLOSE_PARENTH SEMI_COLON')
@@ -807,6 +859,8 @@ class Parser():
         
         @self.pg.production('borrar : CLEAR OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def borrar(p):
+            newQuad = ["CLEAR", "", "", ""]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.error

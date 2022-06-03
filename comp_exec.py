@@ -73,9 +73,23 @@ main () {
 }
 """
 
+text_input9 = """
+program Carat; 
+
+var int miVar1;
+
+main () {
+    lineUp(300);
+    lineDown(200);
+    clear();
+    lineRt(45, 100);
+    lineLf(75, 50);
+}
+"""
+
 def compExec():
     lexer = Lexer().get_lexer()
-    tokens = lexer.lex(text_input5)
+    tokens = lexer.lex(text_input9)
     pg = Parser()
     pg.parse()
     parser = pg.get_parser()

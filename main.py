@@ -153,8 +153,18 @@ main () {
 }
 """
 
+text_input9 = """
+program Carat; 
+
+var int miVar1;
+
+main () {
+    lineUp(2);
+}
+"""
+
 lexer = Lexer().get_lexer()
-tokens = lexer.lex(text_input4)
+tokens = lexer.lex(text_input9)
 
 pg = Parser()
 pg.parse()

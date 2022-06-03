@@ -1,4 +1,5 @@
 import csv
+import turtle
 from stack import Stack
 from pathlib import Path
 from virtual_machine.memVirtM import MemVirtM
@@ -14,6 +15,7 @@ class vm:
         self.currMem = ""
         self.newMem = ""
         self.stackJumps = Stack()
+        self.canvas = turtle.Turtle()
     
     def execute(self):
         self.importFiles()
@@ -198,6 +200,7 @@ class vm:
                 self.newMem.assignVal(2000 + res, valueToPass)
             #CURRENT OPERATION -> END (The program ends)
             elif currOp == 17:
+                turtle.done()
                 break
             #CURRENT OPERATION -> ENDFUNC (The current function ends)
             elif currOp == 18:
@@ -211,5 +214,31 @@ class vm:
                 self.activeMems.pop()
                 self.currMem = self.activeMems.top()
                 cont = self.stackJumps.pop()
+            #CURRENT OPERATION -> LINEUP (Pinta una linea para arriba en la direccion que va)
+            elif currOp == 20:
+                resVal = self.getDirValue(res)
+                self.canvas.forward(resVal)
+            #CURRENT OPERATION -> LINEDOWN (Pinta una linea para abajo en la direccion que va)
+            elif currOp == 21:
+                resVal = self.getDirValue(res)
+                self.canvas.backward(resVal)
+            #CURRENT OPERATION -> RIGHT (Cambia el angulo hacia la derecha)
+            elif currOp == 22:
+                resVal = self.getDirValue(res)
+                self.canvas.right(resVal)
+            #CURRENT OPERATION -> LEFT (Cambia el angulo hacia la izquierda)
+            elif currOp == 23:
+                resVal = self.getDirValue(res)
+                self.canvas.left(resVal)
+            #CURRENT OPERATION -> CLEAR (Borra lo que se había dibujado)
+            elif currOp == 24:
+                self.canvas.clear()
+            #CURRENT OPERATION -> PINTAR (Baja la pluma para pintar mientras se mueve)
+            elif currOp == 25:
+                self.canvas.pendown()
+            #CURRENT OPERATION -> NO PINTAR (Sube la pluma para no pintar mientras se mueve)
+            elif currOp == 26:
+                self.canvas.penup()
+
             
             cont += 1
