@@ -825,16 +825,48 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('punto : POINT OPEN_PARENTH exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('punto : POINT op_parenth exp commaBkpt exp cl_parenth SEMI_COLON')
         def punto(p):
+            coordenadaY = self.stackOperandos.pop()
+            YType = self.stackTipos.pop()
+            coordenadaX = self.stackOperandos.pop()
+            XType = self.stackTipos.pop()
+            if XType != "INT" and XType != "FLOAT":
+                raise ValueError("Error de tipo - Point X (Solo INT o Float)") 
+            if YType != "INT" and YType != "FLOAT":
+                raise ValueError("Error de tipo - Point Y (Solo INT o Float)")
+            newQuad = ["POINT", coordenadaX, coordenadaY, ""]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('circulo : CIRCLE OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('circulo : CIRCLE op_parenth exp cl_parenth SEMI_COLON')
         def circulo(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["CIRCLE", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('arco : ARC OPEN_PARENTH exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('arco : ARC op_parenth exp commaBkpt exp cl_parenth SEMI_COLON')
         def arco(p):
+            angulo = self.stackOperandos.pop()
+            anguloType = self.stackTipos.pop()
+            radio = self.stackOperandos.pop()
+            radioType = self.stackTipos.pop()
+            if anguloType != "INT" and anguloType != "FLOAT":
+                raise ValueError("Error de tipo - ARC Param2 (Solo INT o Float)") 
+            if radioType != "INT" and radioType != "FLOAT":
+                raise ValueError("Error de tipo - ARC Param1 (Solo INT o Float)")
+            newQuad = ["ARCO", angulo, "", radio]
+            self.misQuads.append(newQuad)
+            return p
+        
+        @self.pg.production('commaBkpt : COMMA')
+        def commaBkpt(p):
+            self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
+            self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
         @self.pg.production('pintar : PENDOWN OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
@@ -849,12 +881,32 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('col : PENCOLOR OPEN_PARENTH exp COMMA exp COMMA exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('col : PENCOLOR op_parenth exp commaBkpt exp commaBkpt exp cl_parenth SEMI_COLON')
         def col(p):
+            rgbB = self.stackOperandos.pop()
+            BType = self.stackTipos.pop()
+            rgbG = self.stackOperandos.pop()
+            GType = self.stackTipos.pop()
+            rgbR = self.stackOperandos.pop()
+            RType = self.stackTipos.pop()
+            if BType != "INT" and BType != "FLOAT":
+                raise ValueError("Error de tipo - ARC Param2 (Solo INT o Float)") 
+            if GType != "INT" and GType != "FLOAT":
+                raise ValueError("Error de tipo - ARC Param1 (Solo INT o Float)")
+            if RType != "INT" and RType != "FLOAT":
+                raise ValueError("Error de tipo - ARC Param1 (Solo INT o Float)")
+            newQuad = ["COLOR", rgbR, rgbG, rgbB]
+            self.misQuads.append(newQuad)
             return p
         
-        @self.pg.production('tam : PENSIZE OPEN_PARENTH exp CLOSE_PARENTH SEMI_COLON')
+        @self.pg.production('tam : PENSIZE op_parenth exp cl_parenth SEMI_COLON')
         def tam(p):
+            result = self.stackOperandos.pop()
+            resultType = self.stackTipos.pop()
+            if resultType != "INT" and resultType != "FLOAT":
+                raise ValueError("Error de tipo - LINEUP (Solo INT o Float)") 
+            newQuad = ["SIZE", "", "", result]
+            self.misQuads.append(newQuad)
             return p
         
         @self.pg.production('borrar : CLEAR OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')

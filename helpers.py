@@ -124,3 +124,13 @@ class Helpers:
                 row[0] = 25
             elif op == "NOPINTAR":
                 row[0] = 26
+            elif op == "SIZE":
+                row[0] = 27
+            elif op == "CIRCLE":
+                row[0] = 28
+            elif op == "ARCO":
+                row[0] = 29
+            elif op == "POINT":
+                row[0] = 30
+            elif op == "COLOR":
+                row[0] = 31

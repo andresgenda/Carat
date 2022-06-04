@@ -1,5 +1,6 @@
 import csv
-import turtle
+from turtle import Turtle
+from turtle import Screen
 from stack import Stack
 from pathlib import Path
 from virtual_machine.memVirtM import MemVirtM
@@ -15,7 +16,8 @@ class vm:
         self.currMem = ""
         self.newMem = ""
         self.stackJumps = Stack()
-        self.canvas = turtle.Turtle()
+        self.canvas = Turtle()
+        self.screen = Screen()
     
     def execute(self):
         self.importFiles()
@@ -200,7 +202,7 @@ class vm:
                 self.newMem.assignVal(2000 + res, valueToPass)
             #CURRENT OPERATION -> END (The program ends)
             elif currOp == 17:
-                turtle.done()
+                self.screen.mainloop()
                 break
             #CURRENT OPERATION -> ENDFUNC (The current function ends)
             elif currOp == 18:
@@ -239,6 +241,29 @@ class vm:
             #CURRENT OPERATION -> NO PINTAR (Sube la pluma para no pintar mientras se mueve)
             elif currOp == 26:
                 self.canvas.penup()
-
-            
+            #CURRENT OPERATION -> SIZE (Cambia el tamaño de la pluma)
+            elif currOp == 27:
+                resVal = self.getDirValue(res)
+                self.canvas.pensize(resVal)
+            #CURRENT OPERATION -> CIRCLE (Dibuja un circulo)
+            elif currOp == 28:
+                resVal = self.getDirValue(res)
+                self.canvas.circle(resVal)
+            #CURRENT OPERATION -> ARC (Dibuja un arco)
+            elif currOp == 29:
+                radioVal = self.getDirValue(res)
+                anguloVal = self.getDirValue(op1)
+                self.canvas.circle(radioVal, anguloVal)
+            #CURRENT OPERATION -> POINT (El cursor se dirige a una posición específica)
+            elif currOp == 30:
+                xVal = self.getDirValue(op1)
+                yVal = self.getDirValue(op2)
+                self.canvas.goto(xVal, yVal)
+            elif currOp == 31:
+                r = self.getDirValue(op1)
+                g = self.getDirValue(op2)
+                b = self.getDirValue(res)
+                self.screen.colormode(255)
+                self.canvas.pencolor((r, g, b))
+                
             cont += 1

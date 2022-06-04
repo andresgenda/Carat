@@ -78,12 +78,36 @@ program Carat;
 
 var int miVar1;
 
+int func fib(int x) {
+    if(x < 2){
+        return(x);
+    }
+    return((fib(x-1);) + (fib(x-2);));
+}
+
 main () {
+    miVar1 = 3 + 4 * 2;
+
     lineUp(300);
-    lineDown(200);
     clear();
+    lineDown(200);
+    penUp();
     lineRt(45, 100);
+    penDown();
     lineLf(75, 50);
+    penSize(20 - 5);
+    lineDown(400);
+    penSize(20- 10);
+    circle(miVar1);
+
+    miVar1 = (fib(6););
+
+    penSize(miVar1);
+    arc(30, 120);
+
+    penColor(255, 192, 203);
+
+    point(5, 10);
 }
 """
 
