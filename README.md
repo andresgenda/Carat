@@ -18,3 +18,6 @@ Lo que se generó para el avance 5 fue la creación de cuádruplos para operaci�
 
 # Avance 6 - Generación de código de ciclos completa, generación de código de funciones, asignación de memoria virtual, refactorización de directorio de funciones
 Lo que se realizó para el avance 6 fue completar la generación de código de ciclos (for). Asimismo, se término la generación de código para llamadas a funciones, así como su validación de parámetros y tipos utilizando una tabla de parámetros. De la misma forma, se asigno un espacio de memoria a cada variable, dependiendo de su scope (global, local, temporal y constante) y de su tipo. Se cambió la creación de cuádruplos para que ahora tomen en cuenta las direcciones de cada variable para cada operación. Finalmente, se refactorizó el directorio de funciones y se creó una clase especial para su uso.
+
+# Avance 8 - Funciones especiales completas, recursividad, funciones con retorno y vacías, máquina virtual funcionando
+Lo que se realizó hasta el avance 8 fue la ejecución de la aplicación propia (funciones especiales para pintar), la ejecución de operaciones aritméticas, condicionales y cíclicas. Asimismo, se ejecutan funciones de tipo void o con retorno. Las aplicaciones con retorno son capaces de llamarse a sí mismas (llamadas recursivas) y mostrar un resultado adecuado. 
