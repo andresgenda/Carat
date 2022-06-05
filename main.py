@@ -137,8 +137,7 @@ main () {
 text_input8 = """
 program Carat; 
 
-var int miVar1, miVar2, miVar3;
-var float miFloat;
+var int fibNum;
 
 int func fib(int x) {
     if(x < 2){
@@ -148,8 +147,8 @@ int func fib(int x) {
 }
 
 main () {
-    miVar3 = (fib(9);)
-    print(miVar3);
+    input(fibNum);
+    print(fib(fibNum);)
 }
 """
 
@@ -157,6 +156,7 @@ text_input9 = """
 program Carat; 
 
 var int miVar1;
+var int miArr[2];
 
 main () {
     lineUp(2);

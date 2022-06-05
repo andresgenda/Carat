@@ -1,0 +1,10 @@
+program Carat; 
+
+var int miVar1;
+
+main () {
+    penColor(255, 192, 203);
+    for miVar1 = 1 to 6 do {
+        lineRt(144, 100);
+    }
+}

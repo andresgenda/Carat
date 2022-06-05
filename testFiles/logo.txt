@@ -1,0 +1,130 @@
+program Carat; 
+
+var int miVar1, tam;
+
+void func diamond(){
+    var int cont;
+
+    lineLf(60,200);
+
+    cont = 0;
+
+    while(cont < 2)do{
+        lineLf(120,200);
+        cont = cont + 1;
+    }
+
+    lineLf(150, 170);
+    lineDown(170);
+
+    lineLf(16.5, 180);
+    lineDown(180);
+    lineRt(31.5, 180);
+    penUp();
+    lineRt(75, 53);
+    penDown();
+
+    cont = 0;
+    
+    for miVar1 = 0 to 8 do {
+        if(miVar1 < 2){
+            lineLf(120, 50);
+        }else{
+            if(cont == 0){
+                lineRt(120,50);
+                cont = 1;
+            }else{
+                lineLf(120, 50);
+                cont = 0;
+            }
+            
+        }
+    }
+
+    lineLf(180, 50);
+    lineLf(300, 150);
+}
+
+void func letterC(){
+    arc(60, 180);
+}
+
+void func letterA(){
+    lineLf(80, 120);
+    lineRt(160, 120);
+    lineLf(180, 60);
+    lineLf(80, 20);
+    penUp();
+    lineDown(20);
+    lineRt(80, 0);
+    lineDown(60);
+    lineRt(100, 0);
+}
+
+void func letterR(){
+    lineLf(90, 120);
+    lineLf(90, 0);
+    penUp();
+    arc(30, 180);
+    penDown();
+    arc(30, 180);
+    lineLf(90, 60);
+    lineLf(25, 65);
+    lineLf(65, 0);
+}
+
+void func letterT(){
+    lineLf(90, 120);
+    lineLf(90, 25);
+    lineRt(180, 50);
+    lineDown(25);
+    lineRt(90, 120);
+    lineLf(90, 0);
+}
+
+void func nombre(){
+    (letterC();)
+
+    penUp();
+    lineUp(50);
+    penDown();
+    
+    (letterA();)
+
+    penUp();
+    lineUp(50);
+    penDown();
+
+    (letterR();)
+
+    penUp();
+    lineUp(50);
+    penDown();
+
+    (letterA();)
+
+    penUp();
+    lineUp(50);
+    penDown();
+
+    (letterT();)
+}
+
+main () {
+    penColor(115, 194, 251);
+    tam = 5;
+    penSize(tam);
+
+    (diamond();)
+
+    penUp();
+    point(0, 0);
+    lineLf(90, 0);
+    lineDown(50);
+    lineLf(90, 150);
+    penDown();
+
+    penColor(0, 128, 255);
+
+    (nombre();)
+}

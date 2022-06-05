@@ -43,6 +43,8 @@ class Parser():
         self.paramTable = []
         self.paramCounter = 0
         self.accessFunc = ""
+        self.isReturning = False
+        self.isVoid = False
 
     def parse(self):
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
@@ -149,13 +151,8 @@ class Parser():
         def arreglo(p):
             return p
         
-        @self.pg.production('def_arr : OPEN_BRACK def_arr2')
+        @self.pg.production('def_arr : OPEN_BRACK CTE_INT CLOSE_BRACK')
         def def_arr(p):
-            return p
-        
-        @self.pg.production('def_arr2 : CTE_INT CLOSE_BRACK')
-        @self.pg.production('def_arr2 : ID CLOSE_BRACK')
-        def def_arr2(p):
             return p
         
         @self.pg.production('funcion : f_void')
@@ -178,8 +175,13 @@ class Parser():
         @self.pg.production('bpVoid : VOID')
         def bpVoid(p):
             self.currType = p[0].gettokentype()
+            self.isVoid = True
             return p
 
+        @self.pg.production('isVoid : ')
+        def isVoid(p):
+            self.isVoid = False
+            return p
 
         @self.pg.production('f_void2 : vars addVars f_void3')
         @self.pg.production('f_void2 : addVars f_void3')
@@ -190,8 +192,11 @@ class Parser():
         def f_void3(p):
             return p
         
-        @self.pg.production('f_ret : tipo init OPEN_CURLY f_ret2')
+        @self.pg.production('f_ret : tipo isVoid init OPEN_CURLY f_ret2')
         def f_ret(p):
+            if self.isReturning == False:
+                raise ValueError("La funcion tiene que tener un retorno")
+            self.isReturning = False
             return p
         
         @self.pg.production('f_ret2 : vars addVars f_ret3')
@@ -209,6 +214,8 @@ class Parser():
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             retOp = self.stackOperandos.top()
             tipoActual = self.stackTipos.top()
+            if self.isVoid == True:
+                raise ValueError("Funcion de tipo VOID no puede tener retorno")
             funcType = self.newDirFunc.misFunciones[self.currFunc]["tipo"]
             print(funcType, retOp, tipoActual)
             if tipoActual != funcType:
@@ -216,6 +223,7 @@ class Parser():
             dirFunc = self.newDirFunc.getVarMem(self.globalFunc, self.currFunc)
             newQuad = ["RETURN", dirFunc, "", retOp]
             self.misQuads.append(newQuad)
+            self.isReturning = True
             return p
         
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init2')

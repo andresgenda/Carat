@@ -1,0 +1,15 @@
+program Carat; 
+
+var int fibnum;
+
+int func fib(int x) {
+    if(x < 2){
+        return(x);
+    }
+    return((fib(x-1);) + (fib(x-2);));
+}
+
+main () {
+    input(fibnum);
+    print((fib(fibnum);));
+}

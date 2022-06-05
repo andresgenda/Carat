@@ -1,0 +1,21 @@
+program Carat; 
+
+var int factorial;
+
+void func fact(int x) {
+    var int resultado;
+
+    resultado = x;
+
+    while(x > 1) do {
+        x = x - 1;
+        resultado = resultado * x;
+    }
+    
+    print(resultado);
+}
+
+main () {
+    input(factorial);
+    (fact(factorial);)
+}
