@@ -4,7 +4,7 @@ from rply import ParserGenerator
 from helpers import Helpers
 from quadruples import Quadruples
 from stack import Stack
-from DirFunc import DirFunc
+from dirFunc import DirFunc
 from semanticube import SemanticCube
 from MemVirtual import MemVirtual
 
@@ -53,9 +53,7 @@ class Parser():
             self.newDirFunc.deleteKey(self.currFunc, "vars")
             newQuad = ["END", "", "", ""]
             self.misQuads.append(newQuad)
-            #self.quads.printQuads(self.misQuads)
             self.help.getOperationNumber(self.misQuads)
-            #self.newDirFunc.pr()
             quadsExport = np.array(self.misQuads)
             np.savetxt('ExportedFiles/exportedQuads.csv', quadsExport, delimiter=',', fmt="%s")
             self.memVirt.exportCtes()
@@ -102,8 +100,6 @@ class Parser():
         
         @self.pg.production('vars : VAR tipo vars2')
         def vars(p):
-            #Cuando se terminan de declarar las variables, se agrega la tabla de variables
-            #al la funcion actual, y la tabla de variables se resetea.
             return p
         
         @self.pg.production('vars2 : idAux arreglo vars3')
@@ -115,7 +111,6 @@ class Parser():
         def idAux(p):
             if p[0].value in self.currVarT:
                 raise ValueError("Declaracion multiple de variables")
-            #PUES AQUI PONER LA ACTUAL DIR
             if self.currFunc == self.globalFunc:
                 currDir = self.memVirt.getNextDir(self.currType, 0)
             else:

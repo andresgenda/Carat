@@ -1,7 +1,11 @@
+# ------------- Clase SemanticCube -------------
+# Clase encargada de regresar la consideración semántica en cuanto a combinación de tipos
+
 from helpers import Helpers
 
 class SemanticCube:
 
+    #Diccionario de aritméticas -.- +, -, *, /
     diccArit = {
         "INT" : {
             "INT" : "INT",
@@ -20,6 +24,7 @@ class SemanticCube:
         }
     }
     
+    #Diccionario de asignación -.- =
     diccAsig = {
         "INT" : {
             "INT" : "INT",
@@ -38,6 +43,7 @@ class SemanticCube:
         }
     }
 
+    #Diccionario de comparaciones -.- <, >, !=, ==
     diccComp = {
         "INT" : {
             "INT" : "BOOL",
@@ -56,6 +62,7 @@ class SemanticCube:
         }
     }
 
+    #Diccionario de condicionales -.- &, |
     diccCond = {
         "INT" : {
             "INT" : "ERROR",
@@ -78,18 +85,23 @@ class SemanticCube:
     def __init__(self):
         self.help = Helpers()
 
+    #Regresa el tipo segun el tipo del primer y segundo operando
     def assignType(self, op1, op2, oprt_type):
+        #Checa si la operación es arimética
         if(oprt_type == 1 or oprt_type == 2):
             return self.diccArit[op1][op2]
+        #Checa si la operación es de asignación
         elif(oprt_type == 3):
             return self.diccAsig[op1][op2]
+        #Checa si la operación es de comparación
         elif(oprt_type == 4):
             return self.diccComp[op1][op2]
+        #Checa si la operación es condicional
         elif(oprt_type == 6):
             return self.diccCond[op1][op2]
 
+    #Valida que la operación sea válida, y busca los tipos de cada operando
     def matchTypes(self, op1_type, op2_type, operation):
-
         oprType = self.help.getOperationType(operation)
         
         if(oprType == -1):
@@ -101,62 +113,3 @@ class SemanticCube:
         return_type = self.assignType(op1_type, op2_type, oprType)
         
         return return_type
-
-
-#INT with INT combination
-            #---ARITMETICOS---
-            # + -> INT
-            # - -> INT
-            # * -> INT
-            # / -> INT
-            #---ASIGNACION---
-            # = -> INT
-            #---COMPARACION---
-            # > -> BOOL
-            # < -> BOOL
-            # == -> BOOL
-            # != -> BOOL
-        
-
-        #Si me llega INT, FLOAT:
-        #---ARITMETICOS---
-        # + -> FLOAT
-        # - -> FLOAT
-        # * -> FLOAT
-        # / -> FLOAT
-        #---ASIGNACION---
-        # = -> FLOAT
-        #---COMPARACION---
-        # > -> BOOL
-        # < -> BOOL
-        # == -> BOOL
-        # != -> BOOL
-        
-
-        #Si me llega FLOAT, INT:
-        #---ARITMETICOS---
-        # + -> FLOAT
-        # - -> FLOAT
-        # * -> FLOAT
-        # / -> FLOAT
-        #---ASIGNACION---
-        # = -> ERROR
-        #---COMPARACION---
-        # > -> BOOL
-        # < -> BOOL
-        # == -> BOOL
-        # != -> BOOL
-
-        #Si me llega FLOAT, FLOAT:
-        #---ARITMETICOS---
-        # + -> FLOAT
-        # - -> FLOAT
-        # * -> FLOAT
-        # / -> FLOAT
-        #---ASIGNACION---
-        # = -> FLOAT
-        #---COMPARACION---
-        # > -> BOOL
-        # < -> BOOL
-        # == -> BOOL
-        # != -> BOOL

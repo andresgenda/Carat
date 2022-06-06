@@ -1,5 +1,9 @@
+# ------------- Clase Helpers -------------
+# Clase encargada de almacenar funciones de ayuda generales
+
 class Helpers:
 
+    #Regresa los tokens en forma de lista consecutiva
     def aplana(self, miLista):
         if miLista == []:
             return miLista
@@ -7,6 +11,7 @@ class Helpers:
             return self.aplana(miLista[0]) + self.aplana(miLista[1:])
         return miLista[:1] + self.aplana(miLista[1:])
     
+    #Regresa si es un operador, una operación o un tipo
     def operator_operation(self, currTok):
         token_Types = {
             1 : ["ADD", "SUBSTR", "MULT", "DIVIS", "EQUAL", "MORE_THAN", "LESS_THAN", "IS_EQUAL", "NOT_EQUAL"],
@@ -19,6 +24,7 @@ class Helpers:
                 return key
         return -1
     
+    #Regresa el tipo de operación
     def getOperationType(self, currTok):
         listaTipos = {
             1 : ["ADD", "SUBSTR"],
@@ -33,6 +39,7 @@ class Helpers:
                 return key
         return -1
     
+    #Regresa el tipo del operando
     def getOperatorType(self, currTok):
         listaTipos = {
             "INT" : ["INT", "CTE_INT"],
@@ -46,6 +53,7 @@ class Helpers:
                 return key
         return -1
     
+    #Regresa el scope en donde se encuentra la variable
     def getVarFunction(self, myFunctions, myVar, currFunc, globalFunc):
         if myVar in myFunctions[currFunc]["vars"]:
             return currFunc
@@ -53,6 +61,7 @@ class Helpers:
             return globalFunc
         return -1
     
+    #Regresa el tipo de una variable dada su dirección
     def getTypeDir(self, currDir):
         if currDir < 2000:
             return self.getOffset(currDir - 1000)
@@ -63,12 +72,14 @@ class Helpers:
         elif currDir < 5000:
             return self.getOffset(currDir - 4000)
     
+    #Regresa el offset de una dirección
     def getOffset(self, off):
         if off < 250:
             return "INT"
         elif off < 500:
             return "FLOAT"
     
+    #Regresa el número correspondiente a cada operación
     def getOperationNumber(self, quads):
         for row in quads:
             op = row[0]
