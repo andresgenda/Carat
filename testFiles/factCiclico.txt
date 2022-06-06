@@ -12,7 +12,7 @@ void func fact(int x) {
         resultado = resultado * x;
     }
     
-    print("Factorial iterativo: ", resultado);
+    print(resultado);
 }
 
 main () {
