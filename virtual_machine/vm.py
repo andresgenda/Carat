@@ -1,3 +1,6 @@
+# ------------- Clase vm -------------
+# Clase encargada de correr la máquina virtual y ejecutar los cuádruplos
+
 import csv
 from turtle import Turtle
 from turtle import Screen
@@ -19,16 +22,19 @@ class vm:
         self.canvas = Turtle()
         self.screen = Screen()
     
+    #Ejecuta la máquina virtual
     def execute(self):
         self.importFiles()
         self.startGlobalMem()
         self.execQuads()
-        
+    
+    #Importa los archivos que fueron exportados en compilación
     def importFiles(self):
         self.importQuads()
         self.importCtes()
         self.importFuncs()
     
+    #Importa mis cuádruplos
     def importQuads(self):
         with open("ExportedFiles/exportedQuads.csv") as file:
             file = csv.reader(file)
@@ -43,6 +49,7 @@ class vm:
                     cont += 1
                 self.impQuads.append(row)
     
+    #Importa la tabla de constantes
     def importCtes(self):
         with open("ExportedFiles/exportedCtes.csv") as file:
             file = csv.reader(file)
@@ -68,8 +75,8 @@ class vm:
                     cont += 1
                 rowCont += 1
                 self.impCtes.append(row)
-            #print(self.impCtes)
     
+    #Importa la tabla de funciones
     def importFuncs(self):
         with open("ExportedFiles/exportedFuncs.csv") as file:
             file = csv.reader(file)
@@ -83,11 +90,13 @@ class vm:
                     cont += 1
                 self.impFuncs[row[0]] = row[1:]
     
+    #Comienza la memoria global, y asigna la memoria actual con el valor de la memoria global
     def startGlobalMem(self):
         self.globalMem = MemVirtM(self.impFuncs["Carat"])
         self.currMem = self.globalMem
         self.activeMems.push(self.globalMem)
     
+    #Obtiene el valor de una dirección
     def getDirValue(self, dir):
         if dir < 2000:
             return self.globalMem.getVal(dir)
@@ -96,8 +105,9 @@ class vm:
         elif dir < 5000:
             return self.getCteValue(dir)
         
-
+    #Obtiene el valor de la constante
     def getCteValue(self, dir):
+        #Segun el offset, obtiene el tipo y el número del indice de la constante
         baseType = dir - 4000
         if baseType < 250:
             return self.impCtes[0][baseType]
@@ -108,14 +118,19 @@ class vm:
         else:
             return self.impCtes[3][baseType-750]
     
+    #Asigna un valor a la dirección
     def assignValToDir(self, dir, val):
+        #Si la dirección es menor que 2000, la memoria debe de ser global
         if dir < 2000:
             self.globalMem.assignVal(dir, val)
+        #Si la dirección es mayor o igual a 2000, la memoria debe de ser local
         else:
             self.currMem.assignVal(dir, val)
     
+    #Ejecuta los cuadruplos uno por uno hasta llegar al cuádruplo END
     def execQuads(self):
         gotoMain = self.impQuads[0][3]
+        #El contador comienza en el número de cuádruplo en donde empieza el MAIN
         cont = gotoMain - 1
         while(cont < len(self.impQuads)):
             quadToExec = self.impQuads[cont]
@@ -259,6 +274,7 @@ class vm:
                 xVal = self.getDirValue(op1)
                 yVal = self.getDirValue(op2)
                 self.canvas.goto(xVal, yVal)
+            #CURRENT OPERATION -> COLOR (La pluma cambia de color)
             elif currOp == 31:
                 r = self.getDirValue(op1)
                 g = self.getDirValue(op2)

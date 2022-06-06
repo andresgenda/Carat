@@ -1,9 +1,13 @@
+# ------------- Clase Lexer -------------
+# Clase encargada de agregar y registrar los tokens permitidos por el lenguaje
+
 from rply import LexerGenerator
 
 class Lexer():
     def __init__(self):
         self.lexer = LexerGenerator()
 
+    #Agrega los tokens
     def _add_tokens(self):
         self.lexer.add('PROGRAM', r'program')
         self.lexer.add('LINEUP', r'lineUp')

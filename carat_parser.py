@@ -1,3 +1,7 @@
+# ------------- Clase Parser -------------
+# Clase encargada de implementar la gramática del lenguaje de programación
+# En este módulo se genera el código intermedio
+
 import rply
 import numpy as np
 from rply import ParserGenerator
@@ -47,6 +51,9 @@ class Parser():
         self.isVoid = False
 
     def parse(self):
+
+        #Se exportan las constantes, las funciones y los cuádruplos
+        #Se agrega el cuádruplo de fin de programa
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa2')
         @self.pg.production('programa : PROGRAM mainStart createDF SEMI_COLON programa4')
         def programa(p):
@@ -74,6 +81,7 @@ class Parser():
         def programa4(p):
             return p
         
+        #Punto neurálgico para iniciar el arreglo de cuádruplos con el GOTO al MAIN
         @self.pg.production('mainStart : ')
         def mainStart(p):
             self.stackJumps.push(0)
@@ -81,6 +89,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Rellena el cuádruplo de GOTO al MAIN
         @self.pg.production('fillMain : ')
         def fillMain(p):
             self.newDirFunc.setNumVars(self.currFunc)
@@ -91,6 +100,7 @@ class Parser():
             self.quads.fillGoto(self.stackJumps, self.misQuads)
             return p
 
+        #Crea el directorio de funciones con la función global
         @self.pg.production('createDF : ID')
         def createDF(p):
             self.currFunc = p[0].value
@@ -107,6 +117,8 @@ class Parser():
         def vars2(p):
             return p
         
+        #Verifica que la variable no haya sido declarada
+        #Agrega una nueva variable a la tabla de variables
         @self.pg.production('idAux : ID')
         def idAux(p):
             if p[0].value in self.currVarT:
@@ -124,16 +136,16 @@ class Parser():
         def vars3(p):
             return p
 
+        #Se agrega la tabla de variables al directorio de funciones
+        #Se reinicia la tabla de varibales y la tabla de parámetros
         @self.pg.production('addVars : ')
         def addVars(p):
-            #NEW
             self.newDirFunc.addVar(self.currFunc, self.currVarT)
-            #AQUI CALCULAR NUMERO DE VARIABLES LOCALES (INLCUYENDO
-            # PARAMETROS) Y CUANTAS VARIABLES TEMPORALES UTILICE
             self.currVarT = {}
             self.paramTable = []
             return p
 
+        #Se actualiza el tipo actual al tipo que viene llegando
         @self.pg.production('tipo : INT')
         @self.pg.production('tipo : FLOAT')
         @self.pg.production('tipo : CHAR')
@@ -150,16 +162,17 @@ class Parser():
         def def_arr(p):
             return p
         
+        #Se determina el número de variables utilizadas y se reinician las direcciones
         @self.pg.production('funcion : f_void')
         @self.pg.production('funcion : f_ret')
         def funcion(p):
-            #Al terminar la funcion actual, la funcion actual vuelve a ser la global
             self.newDirFunc.setNumVars(self.currFunc)
             self.newDirFunc.setVarsTotal(self.currFunc)
             self.newDirFunc.deleteKey(self.currFunc, "vars")
             self.memVirt.resetVars()
             newQuad = ["ENDFUNC", "", "", ""]
             self.misQuads.append(newQuad)
+            #Al terminar la funcion actual, la funcion actual vuelve a ser la global
             self.currFunc = self.globalFunc
             return p
 
@@ -167,12 +180,14 @@ class Parser():
         def f_void(p):
             return p
         
+        #Se valida que el tipo de la función es VOID
         @self.pg.production('bpVoid : VOID')
         def bpVoid(p):
             self.currType = p[0].gettokentype()
             self.isVoid = True
             return p
 
+        #Se indica que el tipo de la función NO es VOID
         @self.pg.production('isVoid : ')
         def isVoid(p):
             self.isVoid = False
@@ -187,6 +202,7 @@ class Parser():
         def f_void3(p):
             return p
         
+        #Se valida que la función regrese algo
         @self.pg.production('f_ret : tipo isVoid init OPEN_CURLY f_ret2')
         def f_ret(p):
             if self.isReturning == False:
@@ -204,6 +220,7 @@ class Parser():
         def f_ret3(p):
             return p
         
+        #Se válida que la función sea del tipo adecuado
         @self.pg.production('doReturn : ')
         def doReturn(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -220,6 +237,7 @@ class Parser():
             self.isReturning = True
             return p
         
+        #Se coloca el número de cuádruplo en donde inicia la función
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init2')
         @self.pg.production('init : FUNC bpCurrFunc OPEN_PARENTH init3')
         def init(p):
@@ -229,14 +247,12 @@ class Parser():
             self.newDirFunc.setNumParams(self.currFunc)
             return p
         
-        #Se cambia la funcion actual por la que viene llegando, y se agrega al
-        #directorio junto con su tipo
+        #Se cambia la funcion actual por la que viene llegando, y se agrega al directorio junto con su tipo
         @self.pg.production('bpCurrFunc : ID')
         def bpCurrFunc(p):
             if p[0].value in self.newDirFunc.misFunciones:
                 raise ValueError("Nombre de funcion ya existe")
             self.currFunc = p[0].value
-            #NUEVA TABLA DE FUNCIONES
             self.newDirFunc.addFunc(self.currFunc, self.currType)
             if self.currType != "VOID":
                 currDir = self.memVirt.getNextDir(self.currType, 0)
@@ -253,6 +269,7 @@ class Parser():
         def init3(p):
             return p
         
+        #Se agrega un parámetro a la lista de variables y tabla de parámetros
         @self.pg.production('addParam : tipo ID')
         def addParam(p):
             listaPlana = self.help.aplana(p)
@@ -289,11 +306,13 @@ class Parser():
         def ret(p):
             return p
         
+        #Se realiza la asignación
         @self.pg.production('asignacion : asigHelp asignacion2')
         def asignacion(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
+        #Se válida que la variable que se quiere asignar exista y se guarda su dirección en la pila de operandos
         @self.pg.production('asigHelp : ID EQUAL')
         def asigHelp(p):
             curr_id = p[0].value
@@ -333,6 +352,7 @@ class Parser():
         def elems2(p):
             return p
         
+        #Se busca la variable en caso de que sea ID, o bien se asigna dirección de constante
         @self.pg.production('var_cte : ID')
         @self.pg.production('var_cte : CTE_INT')
         @self.pg.production('var_cte : CTE_FLOAT')
@@ -360,6 +380,7 @@ class Parser():
         def expresion(p):
             return p
         
+        #Se guarda el tipo de operación
         @self.pg.production('expresionComp : MORE_THAN')
         @self.pg.production('expresionComp : LESS_THAN')
         @self.pg.production('expresionComp : IS_EQUAL')
@@ -370,6 +391,7 @@ class Parser():
             self.stackOperaciones.push(currOp)
             return p
 
+        #Se guarda el tipo de operación
         @self.pg.production('expresionCond : AND expresion')
         @self.pg.production('expresionCond : OR expresion')
         def expresionCond(p):
@@ -387,6 +409,9 @@ class Parser():
         def exp(p):
             return p
         
+        #Checa que no haya otra operación aritmética antes que la nueva que llega
+        #Genera el cuádruplo correspondiente
+        #Si hay otra operación, genera su cuádruplo antes de empujar la nueva operación
         @self.pg.production('expSumSub : ADD')
         @self.pg.production('expSumSub : SUBSTR')
         def expSumSub(p):
@@ -411,6 +436,9 @@ class Parser():
         def termino(p):
             return p
         
+        #Checa que no haya otra operación de la misma prioridad
+        #Si es de menor prioridad, mete la operación actual a la pila
+        #Si es de igual prioridad, realiza la operación anterior, y luego se mete a la pila
         @self.pg.production('factorMultDiv : MULT')
         @self.pg.production('factorMultDiv : DIVIS')
         def factorMultDiv(p):
@@ -431,11 +459,13 @@ class Parser():
         def factor(p):
             return p
         
+        #Empuja el paréntesis en las operaciones
         @self.pg.production('op_parenth : OPEN_PARENTH')
         def op_parenth(p):
             self.stackOperaciones.push(p[0].gettokentype())
             return p
         
+        #Realiza todas las operaciones hasta llegar al paréntesis
         @self.pg.production('cl_parenth : CLOSE_PARENTH')
         def cl_parenth(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -451,6 +481,7 @@ class Parser():
         def decision(p):
             return p
         
+        #Llena el GOTO en caso de que la condición sea falsa
         @self.pg.production('decisionWOElse : IF OPEN_PARENTH expresion CLOSE_PARENTH if_bkpt OPEN_CURLY bloque CLOSE_CURLY')
         def decisionWOElse(p):
             currJump = len(self.misQuads) + 1
@@ -458,6 +489,7 @@ class Parser():
             self.quads.fillGoto(self.stackJumps, self.misQuads)
             return p
         
+        #Llena el GOTO para que se brinque el else
         @self.pg.production('decisionWElse : IF OPEN_PARENTH expresion CLOSE_PARENTH if_bkpt OPEN_CURLY bloque CLOSE_CURLY decision2')
         def decisionWElse(p):
             currJump = len(self.misQuads) + 1
@@ -465,6 +497,8 @@ class Parser():
             self.quads.fillGoto(self.stackJumps, self.misQuads)
             return p
         
+        #Crea el cuádruplo de GOTOF
+        #Checa que el tipo sea BOOL
         @self.pg.production('if_bkpt : ')
         def if_bkpt(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -483,6 +517,8 @@ class Parser():
         def decision2(p):
             return p
         
+        #Genera el GOTO que se brinca al else
+        #Llena el GOTOF que se creó 
         @self.pg.production('else_chckpoint : ')
         def else_chckpoint(p):
             newQuad = ["GOTO", "", "", ""]
@@ -503,6 +539,7 @@ class Parser():
         def lectura2(p):
             return p
         
+        #Checa que la variable haya sido declarada
         @self.pg.production('lecturaAux : ID')
         def lecturaAux(p):
             curr_var = p[0].value
@@ -522,16 +559,19 @@ class Parser():
         def escritura2(p):
             return p
         
+        #Empuja la operación print
         @self.pg.production('escritura_expAux : ')
         def escritura_expAux(p):
             self.stackOperaciones.push("PRINT")
             return p
         
+        #Realiza la exp hasta que ya no hayan operaciones restantes
         @self.pg.production('escritura_exp : exp')
         def escritura_exp(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             return p
         
+        #Genera el cuádruplo del PRINT, y asigna una dirección constante al string
         @self.pg.production('escritura_str : CTE_STRING')
         def escritura_str(p):
             curr_val = p[0].value
@@ -546,6 +586,8 @@ class Parser():
         def escritura3(p):
             return p
         
+        #Crea el cuádruplo para regresar a donde comienza el while
+        #Llena el cuádruplo de GOTOF
         @self.pg.production('ciclo_cc : WHILE while_bkpt OPEN_PARENTH expresion CLOSE_PARENTH DO while_cond OPEN_CURLY bloque CLOSE_CURLY')
         def ciclo_cc(p):
             newQuad = ["GOTO", "", "", ""]
@@ -558,12 +600,14 @@ class Parser():
             self.quads.fillGotoWhile(self.stackJumps, self.misQuads)
             return p
         
+        #Agrega el número del cuádruplo donde empieza el while a la pila de saltos
         @self.pg.production('while_bkpt : ')
         def while_bkpt(p):
             currJump = len(self.misQuads) + 1
             self.stackJumps.push(currJump)
             return p
         
+        #Genera el cuádruplo GOTOF
         @self.pg.production('while_cond : ')
         def while_cond(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -578,6 +622,9 @@ class Parser():
                 self.misQuads.append(newQuad)
             return p
         
+        #Realiza la suma de 1 al vector del control
+        #Genera el GOTO para regresar a la comparación
+        #Llena el GOTOF en caso de ser falsa
         @self.pg.production('ciclo_sc : FOR for_idbkpt EQUAL expFor exp for_expbkptone TO expFor exp for_expbkpttwo DO OPEN_CURLY bloque CLOSE_CURLY')
         def ciclo_sc(p):
             vcontrol = self.stackOperandos.pop()
@@ -600,11 +647,13 @@ class Parser():
             self.quads.fillGotoWhile(self.stackJumps, self.misQuads)
             return p
         
+        #Crea un fondo falso
         @self.pg.production('expFor : ')
         def expFor(p):
             self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
+        #Checa que exista la variable
         @self.pg.production('for_idbkpt : ID')
         def for_idbkpt(p):
             curr_id = p[0].value
@@ -632,6 +681,7 @@ class Parser():
                     raise ValueError("Variable de FOR no declarada")
             return p
         
+        #Checa el tip de la expresion y se crea el cuádruplo del vector control
         @self.pg.production('for_expbkptone : ')
         def for_expbkptone(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -650,6 +700,7 @@ class Parser():
                     self.misQuads.append(newQuad)
             return p
         
+        #Se gener el cuádruplo de comparación
         @self.pg.production('for_expbkpttwo : ')
         def for_expbkpttwo(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -676,6 +727,9 @@ class Parser():
                     self.stackJumps.push(currJump)
             return p
         
+        #Revisa que la cantidad de parámetros sea correcta
+        #Genera el cuádruplo GOSUB
+        #Si la función no es VOID, genera un cuádruplo para igualar el resultado a una temporal
         @self.pg.production('llam_func : OPEN_PARENTH verifyFuncID OPEN_PARENTH llam_func2')
         def llam_func(p):
             if self.newDirFunc.getParam(self.accessFunc, self.paramCounter) != -1:
@@ -696,6 +750,8 @@ class Parser():
             self.accessFunc = ""
             return p
         
+        #Verifica que la función exista
+        #Crea el cuádruplo de ERA
         @self.pg.production('verifyFuncID : ID')
         def verifyFuncID(p):
             curr_id = p[0].value
@@ -718,14 +774,15 @@ class Parser():
         def llam_func3(p):
             return p
         
+        #Agrega un fondo falso
         @self.pg.production('addFkBtm : ')
         def addFkBtm(p):
             self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
+        #Checa que el tipo de parámetro coincida con la tabla de parámetros
         @self.pg.production('checkParam : ')
         def checkParam(p):
-            #AQUI HACER UNA FUNCION ESPECIAL PARA ACABAR Q NO SEA EN EQUAL
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             arg = self.stackOperandos.pop()
             curr_type = self.stackTipos.pop()
@@ -756,6 +813,7 @@ class Parser():
         def llam_esp(p):
             return p
         
+        #Genera el cuádruplo que cambia el ángulo de la vuelta a la derecha
         @self.pg.production('commaFkBtmRt : COMMA')
         def commaFkBtmRt(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -768,6 +826,7 @@ class Parser():
             self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
+        #Genera el cuádruplo que cambia el ángulo de la vuelta a la izquierda
         @self.pg.production('commaFkBtmLft : COMMA')
         def commaFkBtmLft(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
@@ -787,6 +846,7 @@ class Parser():
         def linea(p):
             return p
         
+        #Genera el cuádruplo de pintar hacia arriba
         @self.pg.production('arriba : LINEUP op_parenth exp cl_parenth SEMI_COLON')
         def arriba(p):
             result = self.stackOperandos.pop()
@@ -797,6 +857,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de pintar hacia abajo
         @self.pg.production('abajo : LINEDOWN op_parenth exp cl_parenth SEMI_COLON')
         def abajo(p):
             result = self.stackOperandos.pop()
@@ -807,6 +868,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de pintar hacia arriba, habiendo dado vuelta a la derecha
         @self.pg.production('derecha : LINERT op_parenth exp commaFkBtmRt exp cl_parenth SEMI_COLON')
         def derecha(p):
             result = self.stackOperandos.pop()
@@ -817,6 +879,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de pintar hacia arriba, habiendo dado vuelta a la izquierda
         @self.pg.production('izq : LINELF op_parenth exp commaFkBtmLft exp cl_parenth SEMI_COLON')
         def izq(p):
             result = self.stackOperandos.pop()
@@ -827,6 +890,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de moverse a un punto
         @self.pg.production('punto : POINT op_parenth exp commaBkpt exp cl_parenth SEMI_COLON')
         def punto(p):
             coordenadaY = self.stackOperandos.pop()
@@ -841,6 +905,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de pintar un circulo
         @self.pg.production('circulo : CIRCLE op_parenth exp cl_parenth SEMI_COLON')
         def circulo(p):
             result = self.stackOperandos.pop()
@@ -851,6 +916,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de pintar un arco
         @self.pg.production('arco : ARC op_parenth exp commaBkpt exp cl_parenth SEMI_COLON')
         def arco(p):
             angulo = self.stackOperandos.pop()
@@ -865,24 +931,28 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Vacía el fondo falso y agrega un nuevo fondo falso
         @self.pg.production('commaBkpt : COMMA')
         def commaBkpt(p):
             self.quads.emptyParenth(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             self.stackOperaciones.push('OPEN_PARENTH')
             return p
         
+        #Genera el cuádruplo de pintar
         @self.pg.production('pintar : PENDOWN OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def pintar(p):
             newQuad = ["PINTAR", "", "", ""]
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de no pintar
         @self.pg.production('no_pintar : PENUP OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def no_pintar(p):
             newQuad = ["NOPINTAR", "", "", ""]
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de cambiar de color de pluma
         @self.pg.production('col : PENCOLOR op_parenth exp commaBkpt exp commaBkpt exp cl_parenth SEMI_COLON')
         def col(p):
             rgbB = self.stackOperandos.pop()
@@ -901,6 +971,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de cambiar de tamaño de pluma
         @self.pg.production('tam : PENSIZE op_parenth exp cl_parenth SEMI_COLON')
         def tam(p):
             result = self.stackOperandos.pop()
@@ -911,6 +982,7 @@ class Parser():
             self.misQuads.append(newQuad)
             return p
         
+        #Genera el cuádruplo de borrar
         @self.pg.production('borrar : CLEAR OPEN_PARENTH CLOSE_PARENTH SEMI_COLON')
         def borrar(p):
             newQuad = ["CLEAR", "", "", ""]
