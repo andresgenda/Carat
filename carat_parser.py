@@ -53,9 +53,9 @@ class Parser():
             self.newDirFunc.deleteKey(self.currFunc, "vars")
             newQuad = ["END", "", "", ""]
             self.misQuads.append(newQuad)
-            self.quads.printQuads(self.misQuads)
+            #self.quads.printQuads(self.misQuads)
             self.help.getOperationNumber(self.misQuads)
-            self.newDirFunc.pr()
+            #self.newDirFunc.pr()
             quadsExport = np.array(self.misQuads)
             np.savetxt('ExportedFiles/exportedQuads.csv', quadsExport, delimiter=',', fmt="%s")
             self.memVirt.exportCtes()
@@ -217,7 +217,6 @@ class Parser():
             if self.isVoid == True:
                 raise ValueError("Funcion de tipo VOID no puede tener retorno")
             funcType = self.newDirFunc.misFunciones[self.currFunc]["tipo"]
-            print(funcType, retOp, tipoActual)
             if tipoActual != funcType:
                 raise ValueError("Return - Function Type-mismatch")
             dirFunc = self.newDirFunc.getVarMem(self.globalFunc, self.currFunc)
@@ -376,8 +375,8 @@ class Parser():
             self.stackOperaciones.push(currOp)
             return p
 
-        @self.pg.production('expresionCond : AND expresion3')
-        @self.pg.production('expresionCond : OR expresion3')
+        @self.pg.production('expresionCond : AND expresion')
+        @self.pg.production('expresionCond : OR expresion')
         def expresionCond(p):
             self.quads.assignQuadCopy(self.stackOperandos, self.stackTipos, self.stackOperaciones, self.misQuads, self.memVirt, self.newDirFunc, self.currFunc)
             currOp = p[0].gettokentype()

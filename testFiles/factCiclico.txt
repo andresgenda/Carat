@@ -16,6 +16,7 @@ void func fact(int x) {
 }
 
 main () {
+    print("Ingresa un numero: ");
     input(factorial);
     (fact(factorial);)
 }

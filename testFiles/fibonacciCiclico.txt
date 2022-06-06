@@ -19,6 +19,7 @@ void func fib(int x){
 }
 
 main () {
+    print("Ingresa un numero: ");
     input(fibnum);
     (fib(fibnum);)
 }

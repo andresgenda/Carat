@@ -10,6 +10,7 @@ int func fib(int x) {
 }
 
 main () {
+    print("Ingresa un numero: ");
     input(fibnum);
     print((fib(fibnum);));
 }
