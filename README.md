@@ -24,7 +24,191 @@ Lo que se realizó hasta el avance 8 fue la ejecución de la aplicación propia 
 
 # MANUAL DE USUARIO - Quick Reference Manual
 
-```python
+Para que un usuario pueda correr una aplicación desarrollada en el lenguaje “Carat” es necesario instalar un ambiente de desarrollo Python 3.0, así como la dependencia Anaconda para correr el Lexer y el Parser.
+
+Las acciones que se pueden realizar son las siguientes:
+
+# Inicio de programa
+```
+program MiPrograma;
+```
+Cualquier programa escrito en el lenguaje “Carat” debe de ser iniciado con la línea anterior, cambiando el nombre MiPrograma por el nombre de elección del usuario.
+
+# Declaración de variables
+```
+var int miVariable1, miVariable2;
+var float miFloat1;
+```
+Para declarar una variable es necesario escribir la palabra var, seguido por el tipo que se desea declarar. Una vez hecho esto, se pueden declarar las variables deseadas.
+
+# Función main
+```
+main(){
+	...
+}
+```
+Para ejecutar cualquier programa, es necesario crear la función main, y dentro de ella poner los estatutos por ejecutar.
+
+# Input
+```
+input(miVariable1);
+```
+Para recibir datos de entrada, se utiliza la función input.
+
+# Print
+```
+print(“Hello, world!”);
+```
+Para imprimir datos en la consola, se utiliza la función print. La función puede recibir datos enteros, flotantes, strings, o nombres de variables.
+
+# Asignación
+```
+miVariable1 = 5 + 5;
+```
+Para realizar una asignación, es necesario haber declarado la variable anteriormente.
+
+# For
+```
+for i = 0 to 5 do {
+	print(i);
+}
+```
+Se debe tomar en consideración que la variable i ya fue declarada anteriormente. El estatuto for se detiene cuando la variable de control es mayor o igual que el límite establecido.
+
+# While
+```
+while (i > 0) do {
+	print(i);
+	i = i - 1;
+}
+```
+El estatuto while se ejecuta hasta que la condición deje de ser verdadera.
+
+# If - Else
+```
+if (i > 5) {
+	print(“Variable i es mayor que 5”);
+} else {
+	print(“Variable i es menor o igual que 5”);
+}
+```
+El estatuto if entra a la condición si esta es verdadera, de otra forma, se va dentro del estatuto else.
+
+# Función Void
+```
+void func fact(int x) {
+    var int resultado;
+
+    resultado = x;
+
+    while(x > 1) do {
+        x = x - 1;
+        resultado = resultado * x;
+    }
+    
+    print(resultado);
+}
+```
+La función de tipo void, no tiene ningún valor de retorno.
+
+# Función con Retorno
+```
+int func fact(int x) {
+    if(x == 0){
+        return(1);
+    }
+    return(x * (fact(x-1);));
+}
+```
+La función debe de retornar el mismo tipo con el que fue declarado.
+
+# Llamada a función
+```
+miVar1 = (fact(5););
+```
+Para llamar a una función, es necesario poner paréntesis que encierran a la función que se desea llamar.
+
+# Pintar hacia arriba
+```
+lineUp(50);
+```
+Esta función pinta una línea hacia arriba, dependiendo de la dirección en la que vaya el cursor. El parámetro que recibe es el número de desplazamiento.
+
+# Pintar hacia abajo
+```
+lineDown(50);
+```
+Esta función pinta una línea hacia abajo, dependiendo de la dirección en la que vaya el cursor. El parámetro que recibe es el número de desplazamiento.
+
+# Pintar hacia la derecha
+```
+lineRt(25, 100);
+```
+Esta función pinta una línea hacia la derecha, dependiendo de la dirección en la que vaya el cursor. El primer parámetro es el ángulo hacia la derecha que tomará el cursor, y el segundo parámetro es el desplazamiento.
+
+# Pintar hacia la izquierda
+```
+lineLf(25, 100);
+```
+Esta función pinta una línea hacia la izquierda, dependiendo de la dirección en la que vaya el cursor. El primer parámetro es el ángulo hacia la izquierda que tomará el cursor, y el segundo parámetro es el desplazamiento.
+
+# Moverse a una coordenada
+```
+point(0, 0);
+```
+Esta función lleva al cursor a una coordenada sobre el canvas. Los números solo pueden ser positivos y en caso de tener la pluma abajo, el desplazamiento se pintará. El primer parámetro representa el desplazamiento en ‘x’ y el segundo el desplazamiento en ‘y’.
+
+# Pintar un círculo
+```
+circle(25);
+```
+Esta función pinta un círculo. El parámetro que recibe representa el radio del círculo
+
+# Pintar un arco
+```
+arc(25, 90);
+```
+Esta función pinta un arco. El primer parámetro representa el radio del arco y el segundo parámetro representa el ángulo en donde se detendrá el cursor.
+
+# Pintar sobre el canvas
+```
+penDown();
+```
+Esta función baja la pluma sobre el canvas, pintando lo que se le indique.
+
+# Dejar de pintar sobre el canvas
+```
+penUp();
+```
+Esta función sube la pluma del canvas, dejando de pintar lo que se le indique.
+
+# Color de la pluma
+```
+penColor(255,255,255);
+```
+Esta función cambia el color de la pluma. Los parámetros que recibe son los valores R, G y B del color al que se desea cambiar respectivamente.
+
+# Tamaño de la pluma
+```
+penSize(10);
+```
+Esta función cambia el tamaño de la pluma. El parámetro que recibe es el tamaño de la pluma.
+
+# Borrar el canvas
+```
+clear();
+```
+Esta función borra todo lo pintado en el canvas.
+
+Algunas consideraciones que son importantes de tomar en cuenta dentro del lenguaje “Carat”, son las siguientes:
+Las operaciones aritméticas que son permitidas son: +, -, *, /
+Las operaciones de comparación permitidas son: >, <, !=, ==
+Las operaciones de condición permitidas son: &, |
+La operación de asignación es =
+
+Ejemplo general de un programa escrito en Carat, que imprime en pantalla el logo del lenguaje:
+
+```
 program Carat; 
 
 var int miVar1, tam;
@@ -155,3 +339,4 @@ main () {
 
     (nombre();)
 }
+```
