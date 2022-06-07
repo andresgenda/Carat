@@ -26,6 +26,10 @@ Lo que se realizó hasta el avance 8 fue la ejecución de la aplicación propia 
 
 Para que un usuario pueda correr una aplicación desarrollada en el lenguaje “Carat” es necesario instalar un ambiente de desarrollo Python 3.0, así como la dependencia Anaconda para correr el Lexer y el Parser.
 
+Para ejecutar el programa se debe de correr el archivo comp_exec.py
+```
+Python comp_exec.py
+```
 Las acciones que se pueden realizar son las siguientes:
 
 # Inicio de programa
