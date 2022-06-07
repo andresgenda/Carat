@@ -1,4 +1,4 @@
-['1', '126', '255', '2', '81', '12', '4', '0', '160', '144', '10', '256', '100', '59']
+['2', '1']
 []
-['"Ingrese un número entre el 1 y el 2"', '"Ingrese el número de vueltas para el espiral (Menor o igual a 255)"', '"Número introducido fuera del rango permitido por el espiral"', '"Opcion incorrecta"']
+['"Ingresa un numero: "']
 []
