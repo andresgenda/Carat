@@ -1,4 +1,4 @@
-['60', '200', '0', '2', '120', '1', '150', '170', '180', '75', '53', '8', '50', '300', '80', '160', '20', '100', '90', '30', '25', '65', '115', '194', '251', '5', '128', '255']
-['16.5', '31.5']
+['1', '126', '255', '2', '81', '12', '4', '0', '160', '144', '10', '256', '100', '59']
 []
+['"Ingrese un número entre el 1 y el 2"', '"Ingrese el número de vueltas para el espiral (Menor o igual a 255)"', '"Número introducido fuera del rango permitido por el espiral"', '"Opcion incorrecta"']
 []

@@ -1,10 +1,48 @@
 program Carat; 
 
-var int miVar1;
+var int control, r, g, b, spiral;
+var int opcion;
 
 main () {
-    penColor(255, 192, 203);
-    for miVar1 = 0 to 5 do {
-        lineRt(144, 100);
+
+    print("Ingrese un número entre el 1 y el 2");
+    input(opcion);
+    if(opcion == 1){
+        
+        r = 126 * (1 + 1) + 1;
+        g = 255 / 2 + 81;
+        b = 12 * 4 / 2 - 1;
+
+        penColor(r, g, b);
+
+        for control = 0 to 160 do {
+            lineRt(144, control * 10);
+        }
+    }else{
+        if(opcion == 2){
+            print("Ingrese el número de vueltas para el espiral (Menor o igual a 255)");
+            input(spiral);
+
+            r = 0;
+            g = 0;
+            b = 0;
+
+            lineUp(0);
+
+            if(spiral < 256){
+                for control = 1 to spiral do {
+                    penColor(r, g, b);
+                    penSize(control / 100 + 1);
+                    lineLf(59, control);
+                    r = r + 1;
+                    g = g + 1;
+                    b = b + 1;
+                }
+            }else{
+                print("Número introducido fuera del rango permitido por el espiral");
+            }
+        }else{
+            print("Opcion incorrecta");
+        }
     }
 }
