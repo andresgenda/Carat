@@ -92,7 +92,8 @@ class vm:
     
     #Comienza la memoria global, y asigna la memoria actual con el valor de la memoria global
     def startGlobalMem(self):
-        self.globalMem = MemVirtM(self.impFuncs["Carat"])
+        glob = list(self.impFuncs.keys())[0]
+        self.globalMem = MemVirtM(self.impFuncs[glob])
         self.currMem = self.globalMem
         self.activeMems.push(self.globalMem)
     
